@@ -1,0 +1,10 @@
+main: svar.ajneb97.ServerVariables
+version: 1.0.1
+name: ServerVariables
+api-version: 1.13
+softdepend: [PlaceholderAPI]
+
+commands:
+  servervariables:
+    description: Main command of ServerVariables
+    aliases: [svar]

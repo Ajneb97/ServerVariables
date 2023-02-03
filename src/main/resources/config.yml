@@ -1,0 +1,43 @@
+config:
+  data_save_time: 5
+messages:
+  prefix: "&8[&a&lServerVariables&8] "
+  commandSetError: "&cYou need to use: &7/svar set <variable> <value> (optional)<player>"
+  commandGetError: "&cYou need to use: &7/svar get <variable> (optional)<player>"
+  commandAddError: "&cYou need to use: &7/svar add <variable> <value> (optional)<player>"
+  commandReduceError: "&cYou need to use: &7/svar reduce <variable> <value> (optional)<player>"
+  commandResetError: "&cYou need to use: &7/svar reset <variable> (optional)<player>"
+  variableDoesNotExists: "&cThat variable doesn't exists."
+  variableInvalidValue: "&cThat variable only supports &7%value_type% &ctypes."
+  variableNotPossibleValue: "&cThat variable has these possible values: &7%values%"
+  variableSetInvalidTypePlayer: "&cYou can't set a &7PLAYER &cvariable to the server."
+  variableSetInvalidTypeGlobal: "&cYou can't set a &7GLOBAL &cvariable to a player."
+  variableGetInvalidTypePlayer: "&cYou can't get a &7PLAYER &cvariable from the server."
+  variableGetInvalidTypeGlobal: "&cYou can't get a &7GLOBAL &cvariable from a player."
+  variableResetInvalidTypePlayer: "&cYou can't reset a &7PLAYER &cvariable from the server."
+  variableResetInvalidTypeGlobal: "&cYou can't reset a &7GLOBAL &cvariable from a player."
+  variableAddError: "&cCan't add a value to a non-numerical variable."
+  variableReduceError: "&cCan't reduce a value from a non-numerical variable."
+  commandSetCorrect: "&aVariable &7%variable% &aset to &7%value%&a."
+  commandSetCorrectPlayer: "&aVariable &7%variable% &aset to &7%value% &afor player &e%player%&a."
+  playerNotOnline: "&cThat player is not online."
+  pluginReloaded: "&aPlugin reloaded!"
+  commandGetCorrect: "&aVariable &7%variable% &acurrent value is: &7%value%&a."
+  commandGetCorrectPlayer: "&aVariable &7%variable% &acurrent value from player &e%player% &ais: &7%value%&a."
+  invalidValue: "&cYou must use a valid number value."
+  playerNoData: "&cThere is no data for that player."
+  commandResetCorrect: "&aVariable &7%variable% &areset."
+  commandResetCorrectPlayer: "&aVariable &7%variable% &areset for player &e%player%&a."
+variables:
+  lobby_portal_status:
+    variable_type: GLOBAL
+    value_type: TEXT
+    possible_values:
+      - "off"
+      - "on"
+    initial_value: "off"
+  player_influence:
+    variable_type: PLAYER
+    value_type: INTEGER
+    initial_value: 0
+
