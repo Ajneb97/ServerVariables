@@ -8,10 +8,8 @@ import svar.ajneb97.api.ServerVariablesAPI;
 import svar.ajneb97.api.ServerVariablesExpansion;
 import svar.ajneb97.config.ConfigsManager;
 import svar.ajneb97.listeners.PlayerListener;
-import svar.ajneb97.managers.PlayerVariablesManager;
-import svar.ajneb97.managers.ServerVariablesManager;
-import svar.ajneb97.managers.VariablesManager;
-import svar.ajneb97.managers.MessagesManager;
+import svar.ajneb97.managers.*;
+import svar.ajneb97.model.internal.UpdateCheckerResult;
 import svar.ajneb97.tasks.DataSaveTask;
 
 import java.io.File;
@@ -28,6 +26,7 @@ public class ServerVariables extends JavaPlugin {
     private PlayerVariablesManager playerVariablesManager;
     private MessagesManager messagesManager;
     private ConfigsManager configsManager;
+    private UpdateCheckerManager updateCheckerManager;
 
     private DataSaveTask dataSaveTask;
 
@@ -48,6 +47,9 @@ public class ServerVariables extends JavaPlugin {
 
         Bukkit.getConsoleSender().sendMessage(MessagesManager.getColoredMessage(prefix+" &eHas been enabled! &fVersion: "+version));
         Bukkit.getConsoleSender().sendMessage(MessagesManager.getColoredMessage(prefix+" &eThanks for using my plugin!   &f~Ajneb97"));
+
+        updateCheckerManager = new UpdateCheckerManager(version);
+        updateMessage(updateCheckerManager.check());
     }
 
     public void onDisable(){
@@ -91,8 +93,24 @@ public class ServerVariables extends JavaPlugin {
     public void setDataSaveTask(DataSaveTask dataSaveTask) {
         this.dataSaveTask = dataSaveTask;
     }
+    public UpdateCheckerManager getUpdateCheckerManager() {
+        return updateCheckerManager;
+    }
 
     public void registerCommands(){
         this.getCommand("servervariables").setExecutor(new MainCommand(this));
+    }
+
+    public void updateMessage(UpdateCheckerResult result){
+        if(!result.isError()){
+            String latestVersion = result.getLatestVersion();
+            if(latestVersion != null){
+                Bukkit.getConsoleSender().sendMessage(MessagesManager.getColoredMessage("&cThere is a new version available. &e(&7"+latestVersion+"&e)"));
+                Bukkit.getConsoleSender().sendMessage(MessagesManager.getColoredMessage("&cYou can download it at: &fhttps://www.spigotmc.org/resources/107803/"));
+            }
+        }else{
+            Bukkit.getConsoleSender().sendMessage(MessagesManager.getColoredMessage(prefix+" &cError while checking update."));
+        }
+
     }
 }
