@@ -241,15 +241,28 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 			}
 			return completions;
 		}else{
+			List<String> completions = new ArrayList<String>();
+			ArrayList<Variable> variables = plugin.getVariablesManager().getVariables();
 			if((args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("get") || args[0].equalsIgnoreCase("add")
 					|| args[0].equalsIgnoreCase("reduce") || args[0].equalsIgnoreCase("reset"))
 					&& args.length == 2) {
-				List<String> completions = new ArrayList<String>();
 				String argVariable = args[1];
-				ArrayList<Variable> variables = plugin.getVariablesManager().getVariables();
 				for(Variable variable : variables) {
-					if(argVariable.toLowerCase().isEmpty() || variable.getName().toLowerCase().startsWith(argVariable.toLowerCase())) {
+					if(argVariable.isEmpty() || variable.getName().toLowerCase().startsWith(argVariable.toLowerCase())) {
 						completions.add(variable.getName());
+					}
+				}
+				return completions;
+			}else if(args[0].equalsIgnoreCase("set") && args.length == 3){
+				Variable variable = plugin.getVariablesManager().getVariable(args[1]);
+				String argVariable = args[2];
+
+				if(variable != null){
+					List<String> possibleValues = variable.getPossibleValues();
+					for(String possibleValue : possibleValues){
+						if(argVariable.isEmpty() || possibleValue.toLowerCase().startsWith(argVariable.toLowerCase())) {
+							completions.add(possibleValue);
+						}
 					}
 				}
 				return completions;
