@@ -41,16 +41,15 @@ public class ServerVariablesExpansion extends PlaceholderExpansion {
     @Override
     public String onPlaceholderRequest(Player player, String identifier){
 
-        if(player == null){
-            return "";
-        }
-
         if(identifier.startsWith("globalvalue_")){
         	// %servervariables_globalvalue_<variable>%
         	String variableName = identifier.replace("globalvalue_", "");
             return ServerVariablesAPI.getServerVariableValue(variableName);
         }else if(identifier.startsWith("value_")){
             // %servervariables_value_<variable>%
+            if(player == null){
+                return "";
+            }
             String variableName = identifier.replace("value_", "");
             return ServerVariablesAPI.getPlayerVariableValue(player.getName(),variableName);
         }

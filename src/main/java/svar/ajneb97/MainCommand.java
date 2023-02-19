@@ -70,8 +70,8 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 	}
 
 	public void set(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager){
-		//variables set <variable> <value> (Set global variable)
-		//variables set <variable> <value> <player> (Set player variable)
+		//servervariables set <variable> <value> (Set global variable)
+		//servervariables set <variable> <value> <player> (Set player variable)
 		if(args.length <= 2){
 			msgManager.sendMessage(sender,config.getString("messages.commandSetError"),true);
 			return;
@@ -93,8 +93,8 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 	}
 
 	public void get(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager) {
-		//variables get <variable> (Get global variable)
-		//variables get <variable> <player> (Get player variable)
+		//servervariables get <variable> (Get global variable)
+		//servervariables get <variable> <player> (Get player variable)
 		if (args.length <= 1) {
 			msgManager.sendMessage(sender, config.getString("messages.commandGetError"), true);
 			return;
@@ -125,8 +125,8 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 	}
 
 	public void add(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager){
-		//variables add <variable> <value> (Add value to server variable if INTEGER or DOUBLE)
-		//variables add <variable> <value> <player> (Add value to player variable if INTEGER or DOUBLE)
+		//servervariables add <variable> <value> (Add value to server variable if INTEGER or DOUBLE)
+		//servervariables add <variable> <value> <player> (Add value to player variable if INTEGER or DOUBLE)
 		if(args.length <= 2){
 			msgManager.sendMessage(sender,config.getString("messages.commandAddError"),true);
 			return;
@@ -148,8 +148,8 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 	}
 
 	public void reduce(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager){
-		//variables reduce <variable> <value> (Reduce value of server variable if INTEGER or DOUBLE)
-		//variables reduce <variable> <value> <player> (Reduce value of player variable if INTEGER or DOUBLE)
+		//servervariables reduce <variable> <value> (Reduce value of server variable if INTEGER or DOUBLE)
+		//servervariables reduce <variable> <value> <player> (Reduce value of player variable if INTEGER or DOUBLE)
 		if(args.length <= 2){
 			msgManager.sendMessage(sender,config.getString("messages.commandReduceError"),true);
 			return;
@@ -171,8 +171,8 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 	}
 
 	public void reset(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager){
-		//variables reset <variable> (Resets a global variable to the default value)
-		//variables reset <variable> <player> (Resets a player variable to the default value)
+		//servervariables reset <variable> (Resets a global variable to the default value)
+		//servervariables reset <variable> <player> (Resets a player variable to the default value)
 		if(args.length <= 1){
 			msgManager.sendMessage(sender,config.getString("messages.commandResetError"),true);
 			return;
@@ -217,7 +217,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 	}
 
 	public void reload(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager){
-		// /variables reload
+		// /servervariables reload
 		plugin.getConfigsManager().reloadConfigs();
 		msgManager.sendMessage(sender,config.getString("messages.pluginReloaded"),true);
 	}
