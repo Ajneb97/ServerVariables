@@ -5,7 +5,6 @@ import svar.ajneb97.ServerVariables;
 import svar.ajneb97.model.VariableResult;
 import svar.ajneb97.model.structure.ValueType;
 import svar.ajneb97.model.structure.Variable;
-import svar.ajneb97.model.structure.VariableType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,18 +50,18 @@ public class VariablesManager {
         }
 
         //Check for possible values
-        if(!variable.getPossibleValues().isEmpty()){
+        List<String> possibleRealValues = variable.getPossibleRealValues();
+        if(!possibleRealValues.isEmpty()){
             boolean isPossibleValue = false;
             String possibleValuesText = "";
-            List<String> possibleValuesList = variable.getPossibleValues();
 
-            for(int i=0;i<possibleValuesList.size();i++){
-                String possibleValue = possibleValuesList.get(i);
+            for(int i=0;i<possibleRealValues.size();i++){
+                String possibleValue = possibleRealValues.get(i);
                 if(possibleValue.equals(newValue)){
                     isPossibleValue = true;
                     break;
                 }
-                if(i == possibleValuesList.size()-1){
+                if(i == possibleRealValues.size()-1){
                     possibleValuesText = possibleValuesText+possibleValue;
                 }else{
                     possibleValuesText = possibleValuesText+possibleValue+", ";
@@ -76,5 +75,20 @@ public class VariablesManager {
         }
 
         return VariableResult.noErrors(null);
+    }
+
+    public String getDisplayFromVariableValue(Variable variable,String value){
+        List<String> possibleValues = variable.getPossibleValues();
+
+        for(String possibleValue : possibleValues){
+            String[] fullValue = possibleValue.split(";");
+            if(fullValue[0].equals(value)){
+                if(fullValue.length > 1){
+                    return fullValue[1];
+                }
+            }
+        }
+
+        return value;
     }
 }

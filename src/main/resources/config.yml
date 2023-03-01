@@ -33,8 +33,8 @@ variables:
     variable_type: GLOBAL
     value_type: TEXT
     possible_values:
-      - "off"
-      - "on"
+      - "off;&c&lPortal Disabled"
+      - "on;&a&lPortal Enabled"
     initial_value: "off"
   player_influence:
     variable_type: PLAYER

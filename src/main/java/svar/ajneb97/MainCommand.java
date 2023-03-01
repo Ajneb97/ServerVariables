@@ -258,8 +258,8 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 				String argVariable = args[2];
 
 				if(variable != null){
-					List<String> possibleValues = variable.getPossibleValues();
-					for(String possibleValue : possibleValues){
+					List<String> possibleRealValues = variable.getPossibleRealValues();
+					for(String possibleValue : possibleRealValues){
 						if(argVariable.isEmpty() || possibleValue.toLowerCase().startsWith(argVariable.toLowerCase())) {
 							completions.add(possibleValue);
 						}

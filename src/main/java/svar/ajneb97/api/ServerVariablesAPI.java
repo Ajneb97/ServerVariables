@@ -1,6 +1,7 @@
 package svar.ajneb97.api;
 
 import svar.ajneb97.ServerVariables;
+import svar.ajneb97.managers.VariablesManager;
 import svar.ajneb97.model.VariableResult;
 import svar.ajneb97.model.ServerVariablesPlayer;
 
@@ -16,8 +17,24 @@ public class ServerVariablesAPI {
         return result.getResultValue();
     }
 
+    public static String getServerVariableDisplay(String variableName){
+        VariableResult result = plugin.getServerVariablesManager().getVariableValue(variableName,false);
+        if(result.getVariable() != null){
+            return plugin.getVariablesManager().getDisplayFromVariableValue(result.getVariable(),result.getResultValue());
+        }
+        return result.getResultValue();
+    }
+
     public static String getPlayerVariableValue(String playerName, String variableName){
         VariableResult result = plugin.getPlayerVariablesManager().getVariableValue(playerName, variableName, false);
+        return result.getResultValue();
+    }
+
+    public static String getPlayerVariableDisplay(String playerName, String variableName){
+        VariableResult result = plugin.getPlayerVariablesManager().getVariableValue(playerName, variableName, false);
+        if(result.getVariable() != null){
+            return plugin.getVariablesManager().getDisplayFromVariableValue(result.getVariable(),result.getResultValue());
+        }
         return result.getResultValue();
     }
 

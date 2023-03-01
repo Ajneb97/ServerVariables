@@ -1,5 +1,6 @@
 package svar.ajneb97.model.structure;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Variable {
@@ -51,11 +52,15 @@ public class Variable {
         this.initialValue = initialValue;
     }
 
-    public List<String> getPossibleValues() {
+    public List<String> getPossibleValues(){
         return possibleValues;
     }
-
-    public void setPossibleValues(List<String> possibleValues) {
-        this.possibleValues = possibleValues;
+    public List<String> getPossibleRealValues(){
+        List<String> list = new ArrayList<>();
+        for(String value : possibleValues){
+            String realValue = value.split(";")[0];
+            list.add(realValue);
+        }
+        return list;
     }
 }

@@ -45,6 +45,10 @@ public class ServerVariablesExpansion extends PlaceholderExpansion {
         	// %servervariables_globalvalue_<variable>%
         	String variableName = identifier.replace("globalvalue_", "");
             return ServerVariablesAPI.getServerVariableValue(variableName);
+        }else if(identifier.startsWith("globaldisplay_")){
+            // %servervariables_globaldisplay_<variable>%
+            String variableName = identifier.replace("globaldisplay_", "");
+            return ServerVariablesAPI.getServerVariableDisplay(variableName);
         }else if(identifier.startsWith("value_")){
             // %servervariables_value_<variable>%
             if(player == null){
@@ -52,6 +56,13 @@ public class ServerVariablesExpansion extends PlaceholderExpansion {
             }
             String variableName = identifier.replace("value_", "");
             return ServerVariablesAPI.getPlayerVariableValue(player.getName(),variableName);
+        }else if(identifier.startsWith("display_")) {
+            // %servervariables_display_<variable>%
+            if(player == null){
+                return "";
+            }
+            String variableName = identifier.replace("display_", "");
+            return ServerVariablesAPI.getPlayerVariableDisplay(player.getName(),variableName);
         }
 
         return null;
