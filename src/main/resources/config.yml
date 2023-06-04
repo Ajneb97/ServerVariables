@@ -2,11 +2,11 @@ config:
   data_save_time: 5
 messages:
   prefix: "&8[&a&lServerVariables&8] "
-  commandSetError: "&cYou need to use: &7/svar set <variable> <value> (optional)<player>"
-  commandGetError: "&cYou need to use: &7/svar get <variable> (optional)<player>"
-  commandAddError: "&cYou need to use: &7/svar add <variable> <value> (optional)<player>"
-  commandReduceError: "&cYou need to use: &7/svar reduce <variable> <value> (optional)<player>"
-  commandResetError: "&cYou need to use: &7/svar reset <variable> (optional)<player>"
+  commandSetError: "&cYou need to use: &7/svar set <variable> <value> (optional)<player> (optional)silent:true"
+  commandGetError: "&cYou need to use: &7/svar get <variable> (optional)<player> (optional)silent:true"
+  commandAddError: "&cYou need to use: &7/svar add <variable> <value> (optional)<player> (optional)silent:true"
+  commandReduceError: "&cYou need to use: &7/svar reduce <variable> <value> (optional)<player> (optional)silent:true"
+  commandResetError: "&cYou need to use: &7/svar reset <variable> (optional)<player> (optional)silent:true"
   variableDoesNotExists: "&cThat variable doesn't exists."
   variableInvalidValue: "&cThat variable only supports &7%value_type% &ctypes."
   variableNotPossibleValue: "&cThat variable has these possible values: &7%values%"

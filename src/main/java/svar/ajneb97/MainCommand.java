@@ -58,11 +58,11 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 		sender.sendMessage(MessagesManager.getColoredMessage("&7[ [ &8[&aServerVariables&8] &7] ]"));
 		sender.sendMessage(MessagesManager.getColoredMessage(" "));
 		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar help &8Shows this message."));
-		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar set <variable> <value> (optional)<player> &8Sets the value of a variable."));
-		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar get <variable> (optional)<player> &8Gets the value from a variable."));
-		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar add <variable> <value> (optional)<player> &8Adds a value to a variable (INTEGER or DOUBLE)."));
-		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar reduce <variable> <value> (optional)<player> &8Reduces the value of a variable (INTEGER or DOUBLE)."));
-		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar reset <variable> <value> (optional)<player> &8Resets the value of a variable."));
+		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar set <variable> <value> (optional)<player> (optional)silent:true &8Sets the value of a variable."));
+		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar get <variable> (optional)<player> (optional)silent:true &8Gets the value from a variable."));
+		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar add <variable> <value> (optional)<player> (optional)silent:true &8Adds a value to a variable (INTEGER or DOUBLE)."));
+		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar reduce <variable> <value> (optional)<player> (optional)silent:true &8Reduces the value of a variable (INTEGER or DOUBLE)."));
+		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar reset <variable> <value> (optional)<player> (optional)silent:true &8Resets the value of a variable."));
 		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar reload &8Reloads the config."));
 		sender.sendMessage(MessagesManager.getColoredMessage(" "));
 		sender.sendMessage(MessagesManager.getColoredMessage("&7[ [ &8[&aServerVariables&8] &7] ]"));
