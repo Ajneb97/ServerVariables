@@ -82,14 +82,16 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 		String playerName = null;
 
 		VariableResult result = null;
-		if(args.length >= 4){
+		if(args.length >= 4 && !args[3].equals("silent:true")){
 			playerName = args[3];
 			result = plugin.getPlayerVariablesManager().setVariable(playerName,variableName,newValue);
 		}else{
 			result = plugin.getServerVariablesManager().setVariable(variableName,newValue);
 		}
 
-		sendMessageSet(sender,result,msgManager,config,variableName,playerName);
+		boolean silent = args[args.length-1].equals("silent:true");
+
+		sendMessageSet(sender,result,msgManager,config,variableName,playerName,silent);
 	}
 
 	public void get(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager) {
@@ -137,14 +139,16 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 		String playerName = null;
 
 		VariableResult result = null;
-		if(args.length >= 4){
+		if(args.length >= 4 && !args[3].equals("silent:true")){
 			playerName = args[3];
 			result = plugin.getPlayerVariablesManager().modifyVariable(playerName,variableName,value,true);
 		}else{
 			result = plugin.getServerVariablesManager().modifyVariable(variableName,value,true);
 		}
 
-		sendMessageSet(sender,result,msgManager,config,variableName,playerName);
+		boolean silent = args[args.length-1].equals("silent:true");
+
+		sendMessageSet(sender,result,msgManager,config,variableName,playerName,silent);
 	}
 
 	public void reduce(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager){
@@ -160,14 +164,16 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 		String playerName = null;
 
 		VariableResult result = null;
-		if(args.length >= 4){
+		if(args.length >= 4 && !args[3].equals("silent:true")){
 			playerName = args[3];
 			result = plugin.getPlayerVariablesManager().modifyVariable(playerName,variableName,value,false);
 		}else{
 			result = plugin.getServerVariablesManager().modifyVariable(variableName,value,false);
 		}
 
-		sendMessageSet(sender,result,msgManager,config,variableName,playerName);
+		boolean silent = args[args.length-1].equals("silent:true");
+
+		sendMessageSet(sender,result,msgManager,config,variableName,playerName,silent);
 	}
 
 	public void reset(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager){
@@ -182,16 +188,21 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 		String playerName = null;
 
 		VariableResult result = null;
-		if(args.length >= 3){
+		if(args.length >= 3 && !args[2].equals("silent:true")){
 			playerName = args[2];
 			result = plugin.getPlayerVariablesManager().resetVariable(playerName,variableName);
 		}else{
 			result = plugin.getServerVariablesManager().resetVariable(variableName);
 		}
 
+		boolean silent = args[args.length-1].equals("silent:true");
+
 		if(result.isError()){
 			msgManager.sendMessage(sender,result.getErrorMessage(),true);
 		}else{
+			if(silent){
+				return;
+			}
 			if(playerName != null){
 				msgManager.sendMessage(sender,config.getString("messages.commandResetCorrectPlayer").replace("%variable%",variableName)
 						.replace("%player%",playerName),true);
@@ -202,10 +213,13 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 	}
 
 	private void sendMessageSet(CommandSender sender,VariableResult result,MessagesManager msgManager,FileConfiguration config,
-							   String variableName,String playerName){
+							   String variableName,String playerName,boolean silent){
 		if(result.isError()){
 			msgManager.sendMessage(sender,result.getErrorMessage(),true);
 		}else{
+			if(silent){
+				return;
+			}
 			if(playerName != null){
 				msgManager.sendMessage(sender,config.getString("messages.commandSetCorrectPlayer").replace("%variable%",variableName)
 						.replace("%value%",result.getResultValue()).replace("%player%",playerName),true);
@@ -221,6 +235,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 		plugin.getConfigsManager().reloadConfigs();
 		msgManager.sendMessage(sender,config.getString("messages.pluginReloaded"),true);
 	}
+
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
