@@ -26,7 +26,7 @@ public class MessagesManager {
 
     public static String getColoredMessage(String text) {
         if(Bukkit.getVersion().contains("1.16") || Bukkit.getVersion().contains("1.17") || Bukkit.getVersion().contains("1.18")
-                || Bukkit.getVersion().contains("1.19")) {
+                || Bukkit.getVersion().contains("1.19") || Bukkit.getVersion().contains("1.20")) {
             Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
             Matcher match = pattern.matcher(text);
 
