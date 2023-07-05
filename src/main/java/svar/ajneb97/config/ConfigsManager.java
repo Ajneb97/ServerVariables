@@ -36,14 +36,18 @@ public class ConfigsManager {
 
 	public void reloadConfigs(){
 		mainConfigManager.reload();
-		saveData();
 
-		dataConfigManager.configure();
-		playerConfigsManager.loadPlayers();
+		saveServerData();
+		savePlayerData();
 	}
 
-	public void saveData(){
+	public void savePlayerData(){
+		if(plugin.getMySQLConnection() == null){
+			playerConfigsManager.savePlayers();
+		}
+	}
+
+	public void saveServerData(){
 		dataConfigManager.saveData();
-		playerConfigsManager.savePlayers();
 	}
 }

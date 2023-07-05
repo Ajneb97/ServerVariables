@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import svar.ajneb97.api.ServerVariablesAPI;
 import svar.ajneb97.api.ServerVariablesExpansion;
 import svar.ajneb97.config.ConfigsManager;
+import svar.ajneb97.database.MySQLConnection;
 import svar.ajneb97.listeners.PlayerListener;
 import svar.ajneb97.managers.*;
 import svar.ajneb97.model.internal.UpdateCheckerResult;
@@ -30,6 +31,8 @@ public class ServerVariables extends JavaPlugin {
 
     private DataSaveTask dataSaveTask;
 
+    private MySQLConnection mySQLConnection;
+
     public void onEnable(){
         this.variablesManager = new VariablesManager(this);
         this.serverVariablesManager = new ServerVariablesManager(this);
@@ -45,6 +48,11 @@ public class ServerVariables extends JavaPlugin {
             new ServerVariablesExpansion(this).register();
         }
 
+        if(configsManager.getMainConfigManager().isMySQL()){
+            mySQLConnection = new MySQLConnection(this);
+            mySQLConnection.setupMySql();
+        }
+
         Bukkit.getConsoleSender().sendMessage(MessagesManager.getColoredMessage(prefix+" &eHas been enabled! &fVersion: "+version));
         Bukkit.getConsoleSender().sendMessage(MessagesManager.getColoredMessage(prefix+" &eThanks for using my plugin!   &f~Ajneb97"));
 
@@ -53,8 +61,8 @@ public class ServerVariables extends JavaPlugin {
     }
 
     public void onDisable(){
-        this.configsManager.getDataConfigManager().saveData();
-        this.configsManager.getPlayerConfigsManager().savePlayers();
+        this.configsManager.saveServerData();
+        this.configsManager.savePlayerData();
         Bukkit.getConsoleSender().sendMessage(MessagesManager.getColoredMessage(prefix+" &eHas been disabled! &fVersion: "+version));
     }
 
@@ -99,6 +107,10 @@ public class ServerVariables extends JavaPlugin {
 
     public void registerCommands(){
         this.getCommand("servervariables").setExecutor(new MainCommand(this));
+    }
+
+    public MySQLConnection getMySQLConnection() {
+        return mySQLConnection;
     }
 
     public void updateMessage(UpdateCheckerResult result){

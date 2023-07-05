@@ -24,16 +24,7 @@ public class PlayerListener implements Listener {
         Player player = event.getPlayer();
 
         //Create or update player data
-        PlayerVariablesManager playerVariablesManager = plugin.getPlayerVariablesManager();
-        ServerVariablesPlayer p = playerVariablesManager.getPlayerByUUID(player.getUniqueId().toString());
-        if(p != null){
-            //Update name
-            p.setName(player.getName());
-        }else{
-            //Create empty data for player
-            playerVariablesManager.addPlayer(new ServerVariablesPlayer(player.getUniqueId().toString(),player.getName(),
-                                                        new ArrayList<ServerVariablesVariable>()));
-        }
+        plugin.getPlayerVariablesManager().setJoinPlayerData(player);
 
         //Update notification
         String latestVersion = plugin.getUpdateCheckerManager().getLatestVersion();

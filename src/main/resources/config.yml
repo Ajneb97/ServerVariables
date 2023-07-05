@@ -1,5 +1,12 @@
 config:
   data_save_time: 5
+  mysql_database:
+    enabled: false
+    host: localhost
+    port: 3306
+    username: root
+    password: root
+    database: servervariables
 messages:
   prefix: "&8[&a&lServerVariables&8] "
   commandSetError: "&cYou need to use: &7/svar set <variable> <value> (optional)<player> (optional)silent:true"

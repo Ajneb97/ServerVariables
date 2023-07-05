@@ -4,8 +4,10 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import svar.ajneb97.ServerVariables;
 import svar.ajneb97.api.VariableChangeEvent;
+import svar.ajneb97.database.MySQLConnection;
 import svar.ajneb97.model.VariableResult;
 import svar.ajneb97.model.ServerVariablesPlayer;
 import svar.ajneb97.model.ServerVariablesVariable;
@@ -54,6 +56,51 @@ public class PlayerVariablesManager {
         return null;
     }
 
+    public void removePlayerByUUID(String uuid){
+        for(int i=0;i<playerVariables.size();i++){
+            if(playerVariables.get(i).getUuid().equals(uuid)){
+                playerVariables.remove(i);
+                return;
+            }
+        }
+    }
+
+    //When joining the game
+    public void setJoinPlayerData(Player player){
+        if(plugin.getMySQLConnection() != null){
+            MySQLConnection mySQLConnection = plugin.getMySQLConnection();
+            String uuid = player.getUniqueId().toString();
+            new BukkitRunnable(){
+                @Override
+                public void run() {
+                    ServerVariablesPlayer playerData = mySQLConnection.getPlayer(uuid);
+                    removePlayerByUUID(uuid); //Remove data if already exists
+                    if(playerData != null) {
+                        addPlayer(playerData);
+                        //Update name if different
+                        if(!playerData.getName().equals(player.getName())){
+                            playerData.setName(player.getName());
+                            mySQLConnection.updatePlayerName(playerData);
+                        }
+                    }else {
+                        playerData = new ServerVariablesPlayer(uuid,player.getName(),new ArrayList<>());
+                        addPlayer(playerData);
+                        //Create if doesn't exists
+                        mySQLConnection.createPlayer(playerData);
+                    }
+                }
+            }.runTaskAsynchronously(plugin);
+        }else{
+            ServerVariablesPlayer p = getPlayerByUUID(player.getUniqueId().toString());
+            if(p != null){
+                //Update name
+                p.setName(player.getName());
+            }else{
+                //Create empty data for player
+                addPlayer(new ServerVariablesPlayer(player.getUniqueId().toString(),player.getName(),new ArrayList<>()));
+            }
+        }
+    }
 
     public VariableResult modifyVariable(String playerName, String variableName, String value, boolean add){
         FileConfiguration config = plugin.getConfig();
@@ -118,7 +165,12 @@ public class PlayerVariablesManager {
 
         //Update variable value from existing player (should never return null, because of PlayerListener onJoin())
         ServerVariablesPlayer variablesPlayer = getPlayerByUUID(player.getUniqueId().toString());
+
+        if(plugin.getMySQLConnection() != null) {
+            plugin.getMySQLConnection().updateVariable(variablesPlayer,variableName,newValue);
+        }
         variablesPlayer.setVariable(variableName,newValue);
+
 
         plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(player,variable,newValue));
 
@@ -177,6 +229,9 @@ public class PlayerVariablesManager {
             return VariableResult.noErrorsWithVariable(variable.getInitialValue(),variable);
         }
 
+        if(plugin.getMySQLConnection() != null) {
+            plugin.getMySQLConnection().resetVariable(variablesPlayer,name);
+        }
         variablesPlayer.resetVariable(name);
 
         plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(Bukkit.getPlayer(playerName),variable,variable.getInitialValue()));
