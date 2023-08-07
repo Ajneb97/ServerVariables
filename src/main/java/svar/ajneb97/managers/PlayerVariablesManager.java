@@ -157,22 +157,18 @@ public class PlayerVariablesManager {
             return VariableResult.error(config.getString("messages.variableSetInvalidTypeGlobal"));
         }
 
-        //Check if player is online
-        Player player = Bukkit.getPlayer(playerName);
-        if(player == null){
-            return VariableResult.error(config.getString("messages.playerNotOnline"));
+        ServerVariablesPlayer variablesPlayer = getPlayerByName(playerName);
+        if(variablesPlayer == null){
+            //The player hasn't joined the server and can't set data.
+            return VariableResult.error(config.getString("messages.playerNoData"));
         }
-
-        //Update variable value from existing player (should never return null, because of PlayerListener onJoin())
-        ServerVariablesPlayer variablesPlayer = getPlayerByUUID(player.getUniqueId().toString());
 
         if(plugin.getMySQLConnection() != null) {
             plugin.getMySQLConnection().updateVariable(variablesPlayer,variableName,newValue);
         }
         variablesPlayer.setVariable(variableName,newValue);
 
-
-        plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(player,variable,newValue));
+        plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(Bukkit.getPlayer(playerName),variable,newValue));
 
         return VariableResult.noErrors(newValue);
     }
