@@ -49,6 +49,14 @@ public class ServerVariablesExpansion extends PlaceholderExpansion {
             // %servervariables_globaldisplay_<variable>%
             String variableName = identifier.replace("globaldisplay_", "");
             return ServerVariablesAPI.getServerVariableDisplay(variableName);
+        }else if(identifier.startsWith("value_otherplayer_")){
+            // %servervariables_value_otherplayer_<player>_<variable>%
+            String[] sep = identifier.replace("value_otherplayer_", "").split("_");
+            return ServerVariablesAPI.getPlayerVariableValue(sep[0],sep[1]);
+        }else if(identifier.startsWith("display_otherplayer_")){
+            // %servervariables_display_otherplayer_<player>_<variable>%
+            String[] sep = identifier.replace("display_otherplayer_", "").split("_");
+            return ServerVariablesAPI.getPlayerVariableDisplay(sep[0],sep[1]);
         }else if(identifier.startsWith("value_")){
             // %servervariables_value_<variable>%
             if(player == null){

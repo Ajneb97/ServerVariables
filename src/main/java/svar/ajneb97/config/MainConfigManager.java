@@ -3,6 +3,7 @@ package svar.ajneb97.config;
 import org.bukkit.configuration.file.FileConfiguration;
 import svar.ajneb97.ServerVariables;
 import svar.ajneb97.managers.MessagesManager;
+import svar.ajneb97.model.structure.Limitations;
 import svar.ajneb97.model.structure.ValueType;
 import svar.ajneb97.model.structure.Variable;
 import svar.ajneb97.model.structure.VariableType;
@@ -49,9 +50,15 @@ public class MainConfigManager {
 				if(config.contains(path+".possible_values")){
 					possibleValues = config.getStringList(path+".possible_values");
 				}
+				Limitations limitations = new Limitations();
+				if(config.contains(path+".limitations.min_value")){
+					limitations.setMinValue(config.getDouble(path+".limitations.min_value"));
+				}
+				if(config.contains(path+".limitations.max_value")){
+					limitations.setMaxValue(config.getDouble(path+".limitations.max_value"));
+				}
 
-
-				Variable variable = new Variable(key, variableType, valueType, initialValue, possibleValues);
+				Variable variable = new Variable(key, variableType, valueType, initialValue, possibleValues, limitations);
 				variables.add(variable);
 			}
 		}
@@ -89,6 +96,10 @@ public class MainConfigManager {
 		Path pathConfig = Paths.get(configFile.getRoute());
 		try{
 			String text = new String(Files.readAllBytes(pathConfig));
+			if(!text.contains("variableLimitationOutOfRangeMax:")){
+				getConfig().set("messages.variableLimitationOutOfRangeMax","&cVariable out of range. Max value is &7%value%");
+				getConfig().set("messages.variableLimitationOutOfRangeMin","&cVariable out of range. Min value is &7%value%");
+			}
 			if(!text.contains("mysql_database:")){
 				getConfig().set("config.mysql_database.enabled", false);
 				getConfig().set("config.mysql_database.host", "localhost");

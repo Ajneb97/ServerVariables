@@ -1,8 +1,10 @@
 package svar.ajneb97.managers;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import svar.ajneb97.ServerVariables;
 import svar.ajneb97.model.VariableResult;
+import svar.ajneb97.model.structure.Limitations;
 import svar.ajneb97.model.structure.ValueType;
 import svar.ajneb97.model.structure.Variable;
 
@@ -71,6 +73,29 @@ public class VariablesManager {
             if(!isPossibleValue){
                 return VariableResult.error(config.getString("messages.variableNotPossibleValue")
                         .replace("%values%",possibleValuesText));
+            }
+        }
+
+        //Check limitations
+        Limitations limitations = variable.getLimitations();
+        if(variable.isNumerical()){
+            double value = Double.parseDouble(newValue);
+            String maxValue;
+            String minValue;
+            if(variable.getValueType().equals(ValueType.DOUBLE)){
+                maxValue = limitations.getMaxValue()+"";
+                minValue = limitations.getMinValue()+"";
+            }else{
+                maxValue = (int)limitations.getMaxValue()+"";
+                minValue = (int)limitations.getMinValue()+"";
+            }
+            if(value > limitations.getMaxValue()){
+                return VariableResult.error(config.getString("messages.variableLimitationOutOfRangeMax")
+                        .replace("%value%",maxValue));
+            }
+            if(value < limitations.getMinValue()){
+                return VariableResult.error(config.getString("messages.variableLimitationOutOfRangeMin")
+                        .replace("%value%",minValue));
             }
         }
 

@@ -10,14 +10,16 @@ public class Variable {
     private ValueType valueType;
     private String initialValue;
     private List<String> possibleValues;
+    private Limitations limitations;
 
     public Variable(String name,VariableType variableType, ValueType valueType, String initialValue
-    ,List<String> possibleValues) {
+    ,List<String> possibleValues,Limitations limitations) {
         this.name = name;
         this.variableType = variableType;
         this.valueType = valueType;
         this.initialValue = initialValue;
         this.possibleValues = possibleValues;
+        this.limitations = limitations;
     }
 
     public String getName() {
@@ -62,5 +64,17 @@ public class Variable {
             list.add(realValue);
         }
         return list;
+    }
+
+    public Limitations getLimitations() {
+        return limitations;
+    }
+
+    public void setLimitations(Limitations limitations) {
+        this.limitations = limitations;
+    }
+
+    public boolean isNumerical(){
+        return valueType.equals(ValueType.INTEGER) || valueType.equals(ValueType.DOUBLE);
     }
 }
