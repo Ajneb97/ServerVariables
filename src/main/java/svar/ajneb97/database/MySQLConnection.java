@@ -128,64 +128,86 @@ public class MySQLConnection {
         }
     }
 
-    public ServerVariablesPlayer getPlayer(String uuid){
-        ServerVariablesPlayer player = null;
-        try(Connection connection = getConnection()){
-            PreparedStatement statement = connection.prepareStatement(
-                    "SELECT servervariables_players.UUID, servervariables_players.PLAYER_NAME, " +
-                            "servervariables_players_variables.NAME, " +
-                            "servervariables_players_variables.VALUE " +
-                            "FROM servervariables_players LEFT JOIN servervariables_players_variables " +
-                            "ON servervariables_players.UUID = servervariables_players_variables.UUID " +
-                            "WHERE servervariables_players.UUID = ?");
+    public void getPlayer(String uuid,PlayerCallback callback){
+        new BukkitRunnable(){
+            @Override
+            public void run() {
+                ServerVariablesPlayer player = null;
+                try(Connection connection = getConnection()){
+                    PreparedStatement statement = connection.prepareStatement(
+                            "SELECT servervariables_players.UUID, servervariables_players.PLAYER_NAME, " +
+                                    "servervariables_players_variables.NAME, " +
+                                    "servervariables_players_variables.VALUE " +
+                                    "FROM servervariables_players LEFT JOIN servervariables_players_variables " +
+                                    "ON servervariables_players.UUID = servervariables_players_variables.UUID " +
+                                    "WHERE servervariables_players.UUID = ?");
 
-            statement.setString(1, uuid);
-            ResultSet result = statement.executeQuery();
+                    statement.setString(1, uuid);
+                    ResultSet result = statement.executeQuery();
 
-            boolean firstFind = true;
-            while(result.next()){
-                String playerName = result.getString("PLAYER_NAME");
-                String variableName = result.getString("NAME");
-                String variableValue = result.getString("VALUE");
-                if(firstFind){
-                    firstFind = false;
-                    player = new ServerVariablesPlayer(uuid,playerName,new ArrayList<>());
-                }
-                if(variableName != null && variableValue != null){
-                    player.addVariable(new ServerVariablesVariable(variableName,variableValue));
+                    boolean firstFind = true;
+                    while(result.next()){
+                        String playerName = result.getString("PLAYER_NAME");
+                        String variableName = result.getString("NAME");
+                        String variableValue = result.getString("VALUE");
+                        if(firstFind){
+                            firstFind = false;
+                            player = new ServerVariablesPlayer(uuid,playerName,new ArrayList<>());
+                        }
+                        if(variableName != null && variableValue != null){
+                            player.addVariable(new ServerVariablesVariable(variableName,variableValue));
+                        }
+                    }
+
+                    ServerVariablesPlayer finalPlayer = player;
+                    new BukkitRunnable(){
+                        @Override
+                        public void run() {
+                            callback.onDone(finalPlayer);
+                        }
+                    }.runTask(plugin);
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return player;
+        }.runTaskAsynchronously(plugin);
     }
 
     public void createPlayer(ServerVariablesPlayer player){
-        try(Connection connection = getConnection()){
-            PreparedStatement statement = connection.prepareStatement(
-                    "INSERT INTO servervariables_players " +
-                            "(UUID, PLAYER_NAME) VALUE (?,?)");
+        new BukkitRunnable(){
+            @Override
+            public void run() {
+                try(Connection connection = getConnection()){
+                    PreparedStatement statement = connection.prepareStatement(
+                            "INSERT INTO servervariables_players " +
+                                    "(UUID, PLAYER_NAME) VALUE (?,?)");
 
-            statement.setString(1, player.getUuid());
-            statement.setString(2, player.getName());
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+                    statement.setString(1, player.getUuid());
+                    statement.setString(2, player.getName());
+                    statement.executeUpdate();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.runTaskAsynchronously(plugin);
     }
 
     public void updatePlayerName(ServerVariablesPlayer player){
-        try(Connection connection = getConnection()){
-            PreparedStatement statement = connection.prepareStatement(
-                    "UPDATE servervariables_players SET " +
-                            "PLAYER_NAME=? WHERE UUID=?");
+        new BukkitRunnable(){
+            @Override
+            public void run() {
+                try(Connection connection = getConnection()){
+                    PreparedStatement statement = connection.prepareStatement(
+                            "UPDATE servervariables_players SET " +
+                                    "PLAYER_NAME=? WHERE UUID=?");
 
-            statement.setString(1, player.getName());
-            statement.setString(2, player.getUuid());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+                    statement.setString(1, player.getName());
+                    statement.setString(2, player.getUuid());
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.runTaskAsynchronously(plugin);
     }
 
     public void updateVariable(ServerVariablesPlayer player,String variable,String value){

@@ -10,6 +10,7 @@ import svar.ajneb97.config.ConfigsManager;
 import svar.ajneb97.database.MySQLConnection;
 import svar.ajneb97.listeners.PlayerListener;
 import svar.ajneb97.managers.*;
+import svar.ajneb97.managers.dependencies.Metrics;
 import svar.ajneb97.model.internal.UpdateCheckerResult;
 import svar.ajneb97.tasks.DataSaveTask;
 
@@ -47,6 +48,7 @@ public class ServerVariables extends JavaPlugin {
         if(Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null){
             new ServerVariablesExpansion(this).register();
         }
+        Metrics metrics = new Metrics(this,19731);
 
         if(configsManager.getMainConfigManager().isMySQL()){
             mySQLConnection = new MySQLConnection(this);

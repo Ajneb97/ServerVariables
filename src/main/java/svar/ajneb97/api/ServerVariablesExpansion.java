@@ -51,12 +51,18 @@ public class ServerVariablesExpansion extends PlaceholderExpansion {
             return ServerVariablesAPI.getServerVariableDisplay(variableName);
         }else if(identifier.startsWith("value_otherplayer_")){
             // %servervariables_value_otherplayer_<player>_<variable>%
-            String[] sep = identifier.replace("value_otherplayer_", "").split("_");
-            return ServerVariablesAPI.getPlayerVariableValue(sep[0],sep[1]);
+            String var = identifier.replace("value_otherplayer_", "");
+            int index = var.indexOf("_");
+            String playerName = var.substring(0,index);
+            String variable = var.substring(index+1);
+            return ServerVariablesAPI.getPlayerVariableValue(playerName,variable);
         }else if(identifier.startsWith("display_otherplayer_")){
             // %servervariables_display_otherplayer_<player>_<variable>%
-            String[] sep = identifier.replace("display_otherplayer_", "").split("_");
-            return ServerVariablesAPI.getPlayerVariableDisplay(sep[0],sep[1]);
+            String var = identifier.replace("display_otherplayer_", "");
+            int index = var.indexOf("_");
+            String playerName = var.substring(0,index);
+            String variable = var.substring(index+1);
+            return ServerVariablesAPI.getPlayerVariableDisplay(playerName,variable);
         }else if(identifier.startsWith("value_")){
             // %servervariables_value_<variable>%
             if(player == null){

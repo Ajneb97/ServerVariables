@@ -8,6 +8,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import svar.ajneb97.ServerVariables;
 import svar.ajneb97.api.VariableChangeEvent;
 import svar.ajneb97.database.MySQLConnection;
+import svar.ajneb97.database.PlayerCallback;
 import svar.ajneb97.model.VariableResult;
 import svar.ajneb97.model.ServerVariablesPlayer;
 import svar.ajneb97.model.ServerVariablesVariable;
@@ -70,26 +71,22 @@ public class PlayerVariablesManager {
         if(plugin.getMySQLConnection() != null){
             MySQLConnection mySQLConnection = plugin.getMySQLConnection();
             String uuid = player.getUniqueId().toString();
-            new BukkitRunnable(){
-                @Override
-                public void run() {
-                    ServerVariablesPlayer playerData = mySQLConnection.getPlayer(uuid);
-                    removePlayerByUUID(uuid); //Remove data if already exists
-                    if(playerData != null) {
-                        addPlayer(playerData);
-                        //Update name if different
-                        if(!playerData.getName().equals(player.getName())){
-                            playerData.setName(player.getName());
-                            mySQLConnection.updatePlayerName(playerData);
-                        }
-                    }else {
-                        playerData = new ServerVariablesPlayer(uuid,player.getName(),new ArrayList<>());
-                        addPlayer(playerData);
-                        //Create if doesn't exists
-                        mySQLConnection.createPlayer(playerData);
+            mySQLConnection.getPlayer(uuid, playerData -> {
+                removePlayerByUUID(uuid); //Remove data if already exists
+                if(playerData != null) {
+                    addPlayer(playerData);
+                    //Update name if different
+                    if(!playerData.getName().equals(player.getName())){
+                        playerData.setName(player.getName());
+                        mySQLConnection.updatePlayerName(playerData);
                     }
+                }else {
+                    playerData = new ServerVariablesPlayer(uuid,player.getName(),new ArrayList<>());
+                    addPlayer(playerData);
+                    //Create if it doesn't exist
+                    mySQLConnection.createPlayer(playerData);
                 }
-            }.runTaskAsynchronously(plugin);
+            });
         }else{
             ServerVariablesPlayer p = getPlayerByUUID(player.getUniqueId().toString());
             if(p != null){
