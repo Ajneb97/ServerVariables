@@ -280,6 +280,10 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 						}
 					}
 				}
+				completions.add("<value>");
+				return completions;
+			}else if((args[0].equalsIgnoreCase("add") || args[0].equalsIgnoreCase("reduce")) && args.length == 3){
+				completions.add("<value>");
 				return completions;
 			}
 		}

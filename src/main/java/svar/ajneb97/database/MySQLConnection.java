@@ -245,7 +245,6 @@ public class MySQLConnection {
     }
 
     public void resetVariable(ServerVariablesPlayer player,String variable){
-        ServerVariablesVariable v = player.getVariable(variable);
         new BukkitRunnable(){
             @Override
             public void run() {

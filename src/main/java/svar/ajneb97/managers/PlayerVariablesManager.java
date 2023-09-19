@@ -106,28 +106,25 @@ public class PlayerVariablesManager {
             return VariableResult.error(result.getErrorMessage());
         }
 
+        //Value must be a number
         if(!NumberUtils.isNumber(value)){
             return VariableResult.error(config.getString("messages.invalidValue"));
         }
 
-        if(result.getVariable().getValueType() == ValueType.TEXT){
+        //ValueType must not be TEXT
+        ValueType valueType = result.getVariable().getValueType();
+        if(valueType == ValueType.TEXT){
             return add ? VariableResult.error(config.getString("messages.variableAddError")) :
                     VariableResult.error(config.getString("messages.variableReduceError"));
         }
 
         try{
-            if(value.contains(".")){
-                //Double
-                double newValue = MathUtils.getDoubleSum(value,result.getResultValue(),add);
+            double newValue = MathUtils.getDoubleSum(value,result.getResultValue(),add);
+            if(value.contains(".") || valueType == ValueType.DOUBLE){
                 return setVariable(playerName,variableName,newValue+"");
             }else{
-                //Integer
-                int numericValue = Integer.parseInt(value);
-                int newValue = add ? Integer.parseInt(result.getResultValue())+numericValue : Integer.parseInt(result.getResultValue())-numericValue;
-                return setVariable(playerName,variableName,newValue+"");
+                return setVariable(playerName,variableName,((int)newValue)+"");
             }
-
-
         }catch(NumberFormatException e){
             return add ? VariableResult.error(config.getString("messages.variableAddError")) :
                     VariableResult.error(config.getString("messages.variableReduceError"));

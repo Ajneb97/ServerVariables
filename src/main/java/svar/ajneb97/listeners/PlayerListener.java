@@ -30,7 +30,7 @@ public class PlayerListener implements Listener {
         String latestVersion = plugin.getUpdateCheckerManager().getLatestVersion();
         if(player.isOp() && !plugin.version.equals(latestVersion)){
             player.sendMessage(MessagesManager.getColoredMessage(plugin.prefix+" &cThere is a new version available. &e(&7"+latestVersion+"&e)"));
-            player.sendMessage(MessagesManager.getColoredMessage("&cYou can download it at: &ahttps://www.spigotmc.org/resources/107803/"));
+            player.sendMessage(MessagesManager.getColoredMessage("&cYou can download it at: &ahttps://modrinth.com/plugin/servervariables"));
         }
     }
 }
