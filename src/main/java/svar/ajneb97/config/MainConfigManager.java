@@ -37,33 +37,7 @@ public class MainConfigManager {
 	
 	public void configure() {
 		FileConfiguration config = configFile.getConfig();
-		ArrayList<Variable> variables = new ArrayList<>();
 
-		if(config.contains("variables")){
-			for(String key : config.getConfigurationSection("variables").getKeys(false)){
-				String path = "variables."+key;
-				VariableType variableType = VariableType.valueOf(config.getString(path+".variable_type"));
-				ValueType valueType = ValueType.valueOf(config.getString(path+".value_type"));
-				String initialValue = config.getString(path+".initial_value");
-
-				List<String> possibleValues = new ArrayList<String>();
-				if(config.contains(path+".possible_values")){
-					possibleValues = config.getStringList(path+".possible_values");
-				}
-				Limitations limitations = new Limitations();
-				if(config.contains(path+".limitations.min_value")){
-					limitations.setMinValue(config.getDouble(path+".limitations.min_value"));
-				}
-				if(config.contains(path+".limitations.max_value")){
-					limitations.setMaxValue(config.getDouble(path+".limitations.max_value"));
-				}
-
-				Variable variable = new Variable(key, variableType, valueType, initialValue, possibleValues, limitations);
-				variables.add(variable);
-			}
-		}
-
-		plugin.getVariablesManager().setVariables(variables);
 		plugin.setMessagesManager(new MessagesManager(config.getString("messages.prefix")));
 
 		DataSaveTask dataSaveTask = plugin.getDataSaveTask();
