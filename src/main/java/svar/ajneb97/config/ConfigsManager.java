@@ -29,9 +29,9 @@ public class ConfigsManager {
 	public void configure() {
 		this.mainConfigManager.configure();
 		this.playerConfigsManager.configure();
-		this.dataConfigManager.configure();
 		this.variablesFolderConfigManager.configure();
 		configureVariables();
+		this.dataConfigManager.configure();
 	}
 
 	public void configureVariables(){

@@ -30,6 +30,10 @@ public class ServerVariablesManager {
         return variables;
     }
 
+    public void addVariable(String name,String value){
+        variables.add(new ServerVariablesVariable(name,value));
+    }
+
 
     public ServerVariablesVariable getCurrentVariable(String name){
         for(ServerVariablesVariable v : variables){

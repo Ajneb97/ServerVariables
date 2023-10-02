@@ -31,7 +31,7 @@ public class DataConfigManager {
 
 		if(dataFile.contains("variables")) {
 			for(String key : dataFile.getConfigurationSection("variables").getKeys(false)){
-				serverVariablesManager.setVariable(key,dataFile.getString("variables."+key));
+				serverVariablesManager.addVariable(key,dataFile.getString("variables."+key));
 			}
 		}
 	}
