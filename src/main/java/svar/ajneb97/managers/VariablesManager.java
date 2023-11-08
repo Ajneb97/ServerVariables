@@ -97,6 +97,12 @@ public class VariablesManager {
                 return VariableResult.error(config.getString("messages.variableLimitationOutOfRangeMin")
                         .replace("%value%",minValue));
             }
+        }else{
+            int maxCharacters = limitations.getMaxCharacters();
+            if(newValue.length() > maxCharacters){
+                return VariableResult.error(config.getString("messages.variableLimitationMaxCharactersError")
+                        .replace("%value%",maxCharacters+""));
+            }
         }
 
         return VariableResult.noErrors(null);

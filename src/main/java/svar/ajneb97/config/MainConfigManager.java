@@ -70,9 +70,14 @@ public class MainConfigManager {
 		Path pathConfig = Paths.get(configFile.getRoute());
 		try{
 			String text = new String(Files.readAllBytes(pathConfig));
+			if(!text.contains("variableLimitationMaxCharactersError:")){
+				getConfig().set("messages.variableLimitationMaxCharactersError","&cVariable supports a maximum of &7%value% &ccharacters.");
+				saveConfig();
+			}
 			if(!text.contains("variableLimitationOutOfRangeMax:")){
 				getConfig().set("messages.variableLimitationOutOfRangeMax","&cVariable out of range. Max value is &7%value%");
 				getConfig().set("messages.variableLimitationOutOfRangeMin","&cVariable out of range. Min value is &7%value%");
+				saveConfig();
 			}
 			if(!text.contains("mysql_database:")){
 				getConfig().set("config.mysql_database.enabled", false);

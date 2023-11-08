@@ -37,6 +37,7 @@ messages:
   commandResetCorrectPlayer: "&aVariable &7%variable% &areset for player &e%player%&a."
   variableLimitationOutOfRangeMax: "&cVariable out of range. Max value is &7%value%"
   variableLimitationOutOfRangeMin: "&cVariable out of range. Min value is &7%value%"
+  variableLimitationMaxCharactersError: "&cVariable supports a maximum of &7%value% &ccharacters."
 variables:
   lobby_portal_status:
     variable_type: GLOBAL
