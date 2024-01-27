@@ -35,6 +35,7 @@ messages:
   playerNoData: "&cThere is no data for that player."
   commandResetCorrect: "&aVariable &7%variable% &areset."
   commandResetCorrectPlayer: "&aVariable &7%variable% &areset for player &e%player%&a."
+  commandResetCorrectAll: "&aVariable &7%variable% &areset for &eall players&a."
   variableLimitationOutOfRangeMax: "&cVariable out of range. Max value is &7%value%"
   variableLimitationOutOfRangeMin: "&cVariable out of range. Min value is &7%value%"
   variableLimitationMaxCharactersError: "&cVariable supports a maximum of &7%value% &ccharacters."

@@ -199,7 +199,7 @@ public class PlayerVariablesManager {
         return VariableResult.noErrorsWithVariable(currentVariable.getCurrentValue(),variable);
     }
 
-    public VariableResult resetVariable(String playerName, String name){
+    public VariableResult resetVariable(String playerName, String name, boolean all){
         FileConfiguration config = plugin.getConfig();
 
         ServerVariablesPlayer variablesPlayer = getPlayerByName(playerName);
@@ -214,17 +214,28 @@ public class PlayerVariablesManager {
             return VariableResult.error(config.getString("messages.variableResetInvalidTypeGlobal"));
         }
 
-        if(variablesPlayer == null){
+        if(variablesPlayer == null && !all){
             //Never joined the server.
             return VariableResult.noErrorsWithVariable(variable.getInitialValue(),variable);
         }
 
         if(plugin.getMySQLConnection() != null) {
-            plugin.getMySQLConnection().resetVariable(variablesPlayer,name);
+            if(all){
+                plugin.getMySQLConnection().resetVariable(null,name,true);
+            }else{
+                plugin.getMySQLConnection().resetVariable(variablesPlayer,name,false);
+            }
         }
-        variablesPlayer.resetVariable(name);
 
-        plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(Bukkit.getPlayer(playerName),variable,variable.getInitialValue()));
+        if(all){
+            for(ServerVariablesPlayer p : playerVariables){
+                p.resetVariable(name);
+                plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(Bukkit.getPlayer(p.getName()),variable,variable.getInitialValue()));
+            }
+        }else{
+            variablesPlayer.resetVariable(name);
+            plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(Bukkit.getPlayer(playerName),variable,variable.getInitialValue()));
+        }
 
         return VariableResult.noErrors(null);
     }

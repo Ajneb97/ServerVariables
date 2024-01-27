@@ -244,17 +244,24 @@ public class MySQLConnection {
         }.runTaskAsynchronously(plugin);
     }
 
-    public void resetVariable(ServerVariablesPlayer player,String variable){
+    public void resetVariable(ServerVariablesPlayer player,String variable,boolean all){
         new BukkitRunnable(){
             @Override
             public void run() {
                 try(Connection connection = getConnection()){
-                    PreparedStatement statement = connection.prepareStatement(
-                            "DELETE FROM servervariables_players_variables " +
-                                    "WHERE UUID=? AND NAME=?");
-
-                    statement.setString(1, player.getUuid());
-                    statement.setString(2, variable);
+                    PreparedStatement statement;
+                    if(all){
+                        statement = connection.prepareStatement(
+                                "DELETE FROM servervariables_players_variables " +
+                                        "WHERE NAME=?");
+                        statement.setString(1, variable);
+                    }else{
+                        statement = connection.prepareStatement(
+                                "DELETE FROM servervariables_players_variables " +
+                                        "WHERE UUID=? AND NAME=?");
+                        statement.setString(1, player.getUuid());
+                        statement.setString(2, variable);
+                    }
                     statement.executeUpdate();
                 } catch (SQLException e) {
                     e.printStackTrace();

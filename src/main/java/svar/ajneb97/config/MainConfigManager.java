@@ -70,6 +70,10 @@ public class MainConfigManager {
 		Path pathConfig = Paths.get(configFile.getRoute());
 		try{
 			String text = new String(Files.readAllBytes(pathConfig));
+			if(!text.contains("commandResetCorrectAll:")){
+				getConfig().set("messages.commandResetCorrectAll","&aVariable &7%variable% &areset for &eall players&a.");
+				saveConfig();
+			}
 			if(!text.contains("variableLimitationMaxCharactersError:")){
 				getConfig().set("messages.variableLimitationMaxCharactersError","&cVariable supports a maximum of &7%value% &ccharacters.");
 				saveConfig();

@@ -3,11 +3,13 @@ package svar.ajneb97;
 
 
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import svar.ajneb97.managers.MessagesManager;
 import svar.ajneb97.model.VariableResult;
 import svar.ajneb97.model.structure.Variable;
@@ -190,7 +192,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 		VariableResult result = null;
 		if(args.length >= 3 && !args[2].equals("silent:true")){
 			playerName = args[2];
-			result = plugin.getPlayerVariablesManager().resetVariable(playerName,variableName);
+			result = plugin.getPlayerVariablesManager().resetVariable(playerName,variableName,playerName.equals("all"));
 		}else{
 			result = plugin.getServerVariablesManager().resetVariable(variableName);
 		}
@@ -204,8 +206,12 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 				return;
 			}
 			if(playerName != null){
-				msgManager.sendMessage(sender,config.getString("messages.commandResetCorrectPlayer").replace("%variable%",variableName)
-						.replace("%player%",playerName),true);
+				if(playerName.equals("all")){
+					msgManager.sendMessage(sender,config.getString("messages.commandResetCorrectAll").replace("%variable%",variableName),true);
+				}else{
+					msgManager.sendMessage(sender,config.getString("messages.commandResetCorrectPlayer").replace("%variable%",variableName)
+							.replace("%player%",playerName),true);
+				}
 			}else{
 				msgManager.sendMessage(sender,config.getString("messages.commandResetCorrect").replace("%variable%",variableName),true);
 			}
@@ -285,8 +291,22 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 			}else if((args[0].equalsIgnoreCase("add") || args[0].equalsIgnoreCase("reduce")) && args.length == 3){
 				completions.add("<value>");
 				return completions;
+			}else if(args[0].equalsIgnoreCase("reset") && args.length == 3) {
+				for(Player p : Bukkit.getOnlinePlayers()) {
+					if(args[2].toLowerCase().isEmpty() || p.getName().startsWith(args[2].toLowerCase())){
+						completions.add(p.getName());
+					}
+				}
+				addAllWord(completions,args[2]);
+				return completions;
 			}
 		}
 		return null;
+	}
+
+	private void addAllWord(List<String> completions,String arg){
+		if(arg.isEmpty() || "all".startsWith(arg.toLowerCase())) {
+			completions.add("all");
+		}
 	}
 }
