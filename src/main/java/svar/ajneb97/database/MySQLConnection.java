@@ -12,9 +12,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class MySQLConnection {
 
@@ -74,28 +72,23 @@ public class MySQLConnection {
 
             ResultSet result = statement.executeQuery();
 
-            Set<String> existingUUIDs = new HashSet<>();
+            Map<String, ServerVariablesPlayer> playerMap = new HashMap<>();
             while(result.next()){
                 String uuid = result.getString("UUID");
                 String playerName = result.getString("PLAYER_NAME");
                 String variableName = result.getString("NAME");
                 String variableValue = result.getString("VALUE");
 
-                ServerVariablesPlayer currentPlayer;
-                if(!existingUUIDs.contains(uuid)){
+                ServerVariablesPlayer player = playerMap.get(uuid);
+                if(player == null){
                     //Create and add it
-                    currentPlayer = new ServerVariablesPlayer(uuid,playerName,new ArrayList<>());
-                    players.add(currentPlayer);
-                    existingUUIDs.add(uuid);
-                }else{
-                    currentPlayer = players.stream()
-                            .filter(p -> p.getUuid().equals(uuid))
-                            .findFirst()
-                            .orElse(null);
+                    player = new ServerVariablesPlayer(uuid,playerName,new ArrayList<>());
+                    players.add(player);
+                    playerMap.put(uuid, player);
                 }
 
                 if(variableName != null && variableValue != null){
-                    currentPlayer.addVariable(new ServerVariablesVariable(variableName,variableValue));
+                    player.addVariable(new ServerVariablesVariable(variableName,variableValue));
                 }
             }
         } catch (SQLException e) {

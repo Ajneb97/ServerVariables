@@ -192,7 +192,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 		VariableResult result = null;
 		if(args.length >= 3 && !args[2].equals("silent:true")){
 			playerName = args[2];
-			result = plugin.getPlayerVariablesManager().resetVariable(playerName,variableName,playerName.equals("all"));
+			result = plugin.getPlayerVariablesManager().resetVariable(playerName,variableName,playerName.equals("*"));
 		}else{
 			result = plugin.getServerVariablesManager().resetVariable(variableName);
 		}
@@ -206,7 +206,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 				return;
 			}
 			if(playerName != null){
-				if(playerName.equals("all")){
+				if(playerName.equals("*")){
 					msgManager.sendMessage(sender,config.getString("messages.commandResetCorrectAll").replace("%variable%",variableName),true);
 				}else{
 					msgManager.sendMessage(sender,config.getString("messages.commandResetCorrectPlayer").replace("%variable%",variableName)
@@ -305,8 +305,8 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 	}
 
 	private void addAllWord(List<String> completions,String arg){
-		if(arg.isEmpty() || "all".startsWith(arg.toLowerCase())) {
-			completions.add("all");
+		if(arg.isEmpty() || "*".startsWith(arg.toLowerCase())) {
+			completions.add("*");
 		}
 	}
 }
