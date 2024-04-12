@@ -1,7 +1,5 @@
 package svar.ajneb97.model.structure;
 
-import org.bukkit.Bukkit;
-
 public enum ValueType {
     TEXT,
     INTEGER,

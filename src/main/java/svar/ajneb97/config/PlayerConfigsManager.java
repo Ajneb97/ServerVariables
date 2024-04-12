@@ -120,26 +120,34 @@ public class PlayerConfigsManager {
 		}
 		plugin.getPlayerVariablesManager().setPlayerVariables(players);
 	}
+
+	public void savePlayer(ServerVariablesPlayer player){
+		String playerName = player.getName();
+		PlayerConfig playerConfig = getPlayerConfig(player.getUuid()+".yml");
+		if(playerConfig == null) {
+			registerPlayer(player.getUuid()+".yml");
+			playerConfig = getPlayerConfig(player.getUuid()+".yml");
+		}
+		FileConfiguration playerFile = playerConfig.getConfig();
+
+		playerFile.set("name", playerName);
+		playerFile.set("variables", null);
+		ArrayList<ServerVariablesVariable> variables = player.getVariables();
+		for(ServerVariablesVariable v : variables){
+			playerFile.set("variables."+v.getVariableName(), v.getCurrentValue());
+		}
+
+		playerConfig.savePlayerConfig();
+	}
 	
 	public void savePlayers() {
 		ArrayList<ServerVariablesPlayer> players = plugin.getPlayerVariablesManager().getPlayerVariables();
 
 		for(ServerVariablesPlayer player : players){
-			String playerName = player.getName();
-			PlayerConfig playerConfig = getPlayerConfig(player.getUuid()+".yml");
-			if(playerConfig == null) {
-				registerPlayer(player.getUuid()+".yml");
-				playerConfig = getPlayerConfig(player.getUuid()+".yml");
+			if(player.isModified()){
+				savePlayer(player);
 			}
-			FileConfiguration playerFile = playerConfig.getConfig();
-
-			playerFile.set("name", playerName);
-			playerFile.set("variables", null);
-			ArrayList<ServerVariablesVariable> variables = player.getVariables();
-			for(ServerVariablesVariable v : variables){
-				playerFile.set("variables."+v.getVariableName(), v.getCurrentValue());
-			}
+			player.setModified(false);
 		}
-		savePlayersFiles();
 	}
 }

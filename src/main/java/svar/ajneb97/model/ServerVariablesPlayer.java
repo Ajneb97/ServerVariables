@@ -7,11 +7,21 @@ public class ServerVariablesPlayer {
     private String uuid;
     private String name;
     private ArrayList<ServerVariablesVariable> variables;
+    private boolean modified;
 
     public ServerVariablesPlayer(String uuid, String name, ArrayList<ServerVariablesVariable> variables) {
         this.uuid = uuid;
         this.name = name;
         this.variables = variables;
+        this.modified = false;
+    }
+
+    public boolean isModified() {
+        return modified;
+    }
+
+    public void setModified(boolean modified) {
+        this.modified = modified;
     }
 
     public String getUuid() {
@@ -59,14 +69,17 @@ public class ServerVariablesPlayer {
         }else{
             v.setCurrentValue(newValue);
         }
+        modified = true;
     }
 
-    public void resetVariable(String variableName){
+    public boolean resetVariable(String variableName){
         for(int i=0;i<variables.size();i++){
             if(variables.get(i).getVariableName().equals(variableName)){
                 variables.remove(i);
-                return;
+                modified = true;
+                return true;
             }
         }
+        return false;
     }
 }

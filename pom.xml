@@ -41,6 +41,7 @@
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>4.0.3</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -69,8 +70,11 @@
                         <configuration>
                             <relocations>
                                 <relocation>
-                                    <pattern>com.zaxxer.HikariCP</pattern>
-                                    <shadedPattern>ce.ajneb97.libs.hikaricp</shadedPattern>
+                                    <pattern>com.zaxxer.hikari</pattern>
+                                    <shadedPattern>svar.ajneb97.libs.hikaricp</shadedPattern>
+                                    <includes>
+                                        <include>com.zaxxer.hikari.**</include>
+                                    </includes>
                                 </relocation>
                             </relocations>
                         </configuration>

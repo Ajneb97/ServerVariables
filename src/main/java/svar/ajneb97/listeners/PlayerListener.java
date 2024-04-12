@@ -6,11 +6,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import svar.ajneb97.ServerVariables;
 import svar.ajneb97.managers.MessagesManager;
-import svar.ajneb97.managers.PlayerVariablesManager;
-import svar.ajneb97.model.ServerVariablesPlayer;
-import svar.ajneb97.model.ServerVariablesVariable;
-
-import java.util.ArrayList;
 
 public class PlayerListener implements Listener {
 

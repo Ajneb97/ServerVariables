@@ -4,11 +4,9 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import svar.ajneb97.ServerVariables;
 import svar.ajneb97.api.VariableChangeEvent;
 import svar.ajneb97.database.MySQLConnection;
-import svar.ajneb97.database.PlayerCallback;
 import svar.ajneb97.model.VariableResult;
 import svar.ajneb97.model.ServerVariablesPlayer;
 import svar.ajneb97.model.ServerVariablesVariable;
@@ -50,7 +48,7 @@ public class PlayerVariablesManager {
 
     public ServerVariablesPlayer getPlayerByName(String name){
         for(ServerVariablesPlayer p : playerVariables){
-            if(p.getName().equals(name)){
+            if(p.getName() != null && p.getName().equals(name)){
                 return p;
             }
         }
@@ -91,10 +89,15 @@ public class PlayerVariablesManager {
             ServerVariablesPlayer p = getPlayerByUUID(player.getUniqueId().toString());
             if(p != null){
                 //Update name
-                p.setName(player.getName());
+                if(p.getName() == null || !p.getName().equals(player.getName())){
+                    p.setName(player.getName());
+                    p.setModified(true);
+                }
             }else{
                 //Create empty data for player
-                addPlayer(new ServerVariablesPlayer(player.getUniqueId().toString(),player.getName(),new ArrayList<>()));
+                p = new ServerVariablesPlayer(player.getUniqueId().toString(),player.getName(),new ArrayList<>());
+                p.setModified(true);
+                playerVariables.add(p);
             }
         }
     }
@@ -229,12 +232,14 @@ public class PlayerVariablesManager {
 
         if(all){
             for(ServerVariablesPlayer p : playerVariables){
-                p.resetVariable(name);
-                plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(Bukkit.getPlayer(p.getName()),variable,variable.getInitialValue()));
+                if(p.resetVariable(name) && p.getName() != null){
+                    plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(Bukkit.getPlayer(p.getName()),variable,variable.getInitialValue()));
+                }
             }
         }else{
-            variablesPlayer.resetVariable(name);
-            plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(Bukkit.getPlayer(playerName),variable,variable.getInitialValue()));
+            if(variablesPlayer.resetVariable(name)){
+                plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(Bukkit.getPlayer(playerName),variable,variable.getInitialValue()));
+            }
         }
 
         return VariableResult.noErrors(null);
