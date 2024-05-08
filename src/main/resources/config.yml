@@ -1,5 +1,6 @@
 config:
   data_save_time: 5
+  silent_commands_hide_errors: false
   mysql_database:
     enabled: false
     host: localhost

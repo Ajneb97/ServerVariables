@@ -3,18 +3,12 @@ package svar.ajneb97.config;
 import org.bukkit.configuration.file.FileConfiguration;
 import svar.ajneb97.ServerVariables;
 import svar.ajneb97.managers.MessagesManager;
-import svar.ajneb97.model.structure.Limitations;
-import svar.ajneb97.model.structure.ValueType;
-import svar.ajneb97.model.structure.Variable;
-import svar.ajneb97.model.structure.VariableType;
 import svar.ajneb97.tasks.DataSaveTask;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainConfigManager {
 
@@ -22,6 +16,7 @@ public class MainConfigManager {
 	private CustomConfig configFile;
 
 	private boolean isMySQL;
+	private boolean silentCommandsHideErrors;
 
 	public MainConfigManager(ServerVariables plugin) {
 		this.plugin = plugin;
@@ -48,6 +43,7 @@ public class MainConfigManager {
 		dataSaveTask.start(config.getInt("config.data_save_time"));
 
 		isMySQL = config.getBoolean("config.mysql_database.enabled");
+		silentCommandsHideErrors = config.getBoolean("config.silent_commands_hide_errors");
 	}
 
 	public CustomConfig getConfigFile() {
@@ -70,6 +66,10 @@ public class MainConfigManager {
 		Path pathConfig = Paths.get(configFile.getRoute());
 		try{
 			String text = new String(Files.readAllBytes(pathConfig));
+			if(!text.contains("silent_commands_hide_errors:")){
+				getConfig().set("config.silent_commands_hide_errors",false);
+				saveConfig();
+			}
 			if(!text.contains("commandResetCorrectAll:")){
 				getConfig().set("messages.commandResetCorrectAll","&aVariable &7%variable% &areset for &eall players&a.");
 				saveConfig();
@@ -95,5 +95,9 @@ public class MainConfigManager {
 		}catch(IOException e){
 			e.printStackTrace();
 		}
+	}
+
+	public boolean isSilentCommandsHideErrors() {
+		return silentCommandsHideErrors;
 	}
 }

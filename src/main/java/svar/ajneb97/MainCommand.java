@@ -74,6 +74,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 	public void set(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager){
 		//servervariables set <variable> <value> (Set global variable)
 		//servervariables set <variable> <value> <player> (Set player variable)
+		//servervariables set <variable> "<value with spaces>" <player>
 		if(args.length <= 2){
 			msgManager.sendMessage(sender,config.getString("messages.commandSetError"),true);
 			return;
@@ -81,11 +82,33 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 
 		String variableName = args[1];
 		String newValue = args[2];
+
+		int valueExtraArgs = 0;
+		if(newValue.startsWith("\"")){
+			String newValueWithSpaces = newValue; // "value with spaces"
+			for(int i=3;i<args.length;i++){
+				String arg = args[i];
+				newValueWithSpaces=newValueWithSpaces+" "+arg;
+				valueExtraArgs++;
+				if(arg.endsWith("\"")){
+					break;
+				}
+			}
+
+			if(!newValueWithSpaces.startsWith("\"") || !newValueWithSpaces.endsWith("\"")){
+				msgManager.sendMessage(sender,config.getString("messages.commandSetError"),true);
+				return;
+			}
+
+			newValue = newValueWithSpaces.replace("\"","");
+		}
+
+
 		String playerName = null;
 
 		VariableResult result = null;
-		if(args.length >= 4 && !args[3].equals("silent:true")){
-			playerName = args[3];
+		if(args.length >= 4+valueExtraArgs && !args[3+valueExtraArgs].equals("silent:true")){
+			playerName = args[3+valueExtraArgs];
 			result = plugin.getPlayerVariablesManager().setVariable(playerName,variableName,newValue);
 		}else{
 			result = plugin.getServerVariablesManager().setVariable(variableName,newValue);
@@ -220,7 +243,11 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 
 	private void sendMessageSet(CommandSender sender,VariableResult result,MessagesManager msgManager,FileConfiguration config,
 							   String variableName,String playerName,boolean silent){
+		boolean silentCommandsHideErrors = plugin.getConfigsManager().getMainConfigManager().isSilentCommandsHideErrors();
 		if(result.isError()){
+			if(silent && silentCommandsHideErrors){
+				return;
+			}
 			msgManager.sendMessage(sender,result.getErrorMessage(),true);
 		}else{
 			if(silent){
