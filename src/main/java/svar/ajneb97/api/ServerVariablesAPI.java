@@ -5,6 +5,8 @@ import svar.ajneb97.managers.VariablesManager;
 import svar.ajneb97.model.VariableResult;
 import svar.ajneb97.model.ServerVariablesPlayer;
 
+import java.util.UUID;
+
 public class ServerVariablesAPI {
 
     private static ServerVariables plugin;
@@ -43,6 +45,6 @@ public class ServerVariablesAPI {
     }
 
     public ServerVariablesPlayer getPlayerByUUID(String uuid){
-        return plugin.getPlayerVariablesManager().getPlayerByUUID(uuid);
+        return plugin.getPlayerVariablesManager().getPlayerByUUID(UUID.fromString(uuid));
     }
 }

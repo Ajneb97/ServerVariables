@@ -1,15 +1,16 @@
 package svar.ajneb97.model;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class ServerVariablesPlayer {
 
-    private String uuid;
+    private UUID uuid;
     private String name;
     private ArrayList<ServerVariablesVariable> variables;
     private boolean modified;
 
-    public ServerVariablesPlayer(String uuid, String name, ArrayList<ServerVariablesVariable> variables) {
+    public ServerVariablesPlayer(UUID uuid, String name, ArrayList<ServerVariablesVariable> variables) {
         this.uuid = uuid;
         this.name = name;
         this.variables = variables;
@@ -24,11 +25,11 @@ public class ServerVariablesPlayer {
         this.modified = modified;
     }
 
-    public String getUuid() {
+    public UUID getUuid() {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(UUID uuid) {
         this.uuid = uuid;
     }
 

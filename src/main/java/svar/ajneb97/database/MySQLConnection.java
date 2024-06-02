@@ -61,7 +61,7 @@ public class MySQLConnection {
     }
 
     public void loadData(){
-        ArrayList<ServerVariablesPlayer> players = new ArrayList<>();
+        Map<UUID, ServerVariablesPlayer> playerMap = new HashMap<>();
         try(Connection connection = getConnection()){
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT servervariables_players.UUID, servervariables_players.PLAYER_NAME, " +
@@ -71,10 +71,8 @@ public class MySQLConnection {
                             "ON servervariables_players.UUID = servervariables_players_variables.UUID");
 
             ResultSet result = statement.executeQuery();
-
-            Map<String, ServerVariablesPlayer> playerMap = new HashMap<>();
             while(result.next()){
-                String uuid = result.getString("UUID");
+                UUID uuid = UUID.fromString(result.getString("UUID"));
                 String playerName = result.getString("PLAYER_NAME");
                 String variableName = result.getString("NAME");
                 String variableValue = result.getString("VALUE");
@@ -83,7 +81,6 @@ public class MySQLConnection {
                 if(player == null){
                     //Create and add it
                     player = new ServerVariablesPlayer(uuid,playerName,new ArrayList<>());
-                    players.add(player);
                     playerMap.put(uuid, player);
                 }
 
@@ -95,7 +92,7 @@ public class MySQLConnection {
             e.printStackTrace();
         }
 
-        plugin.getPlayerVariablesManager().setPlayerVariables(players);
+        plugin.getPlayerVariablesManager().setPlayerVariables(playerMap);
     }
 
     public void createTables() {
@@ -145,7 +142,7 @@ public class MySQLConnection {
                         String variableValue = result.getString("VALUE");
                         if(firstFind){
                             firstFind = false;
-                            player = new ServerVariablesPlayer(uuid,playerName,new ArrayList<>());
+                            player = new ServerVariablesPlayer(UUID.fromString(uuid),playerName,new ArrayList<>());
                         }
                         if(variableName != null && variableValue != null){
                             player.addVariable(new ServerVariablesVariable(variableName,variableValue));
@@ -175,7 +172,7 @@ public class MySQLConnection {
                             "INSERT INTO servervariables_players " +
                                     "(UUID, PLAYER_NAME) VALUE (?,?)");
 
-                    statement.setString(1, player.getUuid());
+                    statement.setString(1, player.getUuid().toString());
                     statement.setString(2, player.getName());
                     statement.executeUpdate();
                 } catch (SQLException e) {
@@ -195,7 +192,7 @@ public class MySQLConnection {
                                     "PLAYER_NAME=? WHERE UUID=?");
 
                     statement.setString(1, player.getName());
-                    statement.setString(2, player.getUuid());
+                    statement.setString(2, player.getUuid().toString());
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -216,7 +213,7 @@ public class MySQLConnection {
                                 "INSERT INTO servervariables_players_variables " +
                                         "(UUID, NAME, VALUE) VALUE (?,?,?)");
 
-                        statement.setString(1, player.getUuid());
+                        statement.setString(1, player.getUuid().toString());
                         statement.setString(2, variable);
                         statement.setString(3, value);
                     }else{
@@ -226,7 +223,7 @@ public class MySQLConnection {
                                         "VALUE=? WHERE UUID=? AND NAME=?");
 
                         statement.setString(1, value);
-                        statement.setString(2, player.getUuid());
+                        statement.setString(2, player.getUuid().toString());
                         statement.setString(3, variable);
                     }
                     statement.executeUpdate();
@@ -252,7 +249,7 @@ public class MySQLConnection {
                         statement = connection.prepareStatement(
                                 "DELETE FROM servervariables_players_variables " +
                                         "WHERE UUID=? AND NAME=?");
-                        statement.setString(1, player.getUuid());
+                        statement.setString(1, player.getUuid().toString());
                         statement.setString(2, variable);
                     }
                     statement.executeUpdate();

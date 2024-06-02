@@ -2,6 +2,9 @@ package svar.ajneb97.config;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import svar.ajneb97.ServerVariables;
@@ -102,12 +105,12 @@ public class PlayerConfigsManager {
 	}
 	
 	public void loadPlayers() {
-		ArrayList<ServerVariablesPlayer> players = new ArrayList<ServerVariablesPlayer>();
+		Map<UUID,ServerVariablesPlayer> players = new HashMap<>();
 		
 		for(PlayerConfig playerConfig : configPlayers) {
 			FileConfiguration playerFile = playerConfig.getConfig();
 			String name = playerFile.getString("name");
-			String uuid = playerConfig.getPath().replace(".yml", "");
+			String uuidString = playerConfig.getPath().replace(".yml", "");
 			ArrayList<ServerVariablesVariable> variables = new ArrayList<ServerVariablesVariable>();
 			if(playerFile.contains("variables")){
 				for(String key : playerFile.getConfigurationSection("variables").getKeys(false)){
@@ -115,8 +118,9 @@ public class PlayerConfigsManager {
 				}
 			}
 
+			UUID uuid = UUID.fromString(uuidString);
 			ServerVariablesPlayer player = new ServerVariablesPlayer(uuid,name,variables);
-			players.add(player);
+			players.put(uuid,player);
 		}
 		plugin.getPlayerVariablesManager().setPlayerVariables(players);
 	}
@@ -141,9 +145,10 @@ public class PlayerConfigsManager {
 	}
 	
 	public void savePlayers() {
-		ArrayList<ServerVariablesPlayer> players = plugin.getPlayerVariablesManager().getPlayerVariables();
+		Map<UUID, ServerVariablesPlayer> players = plugin.getPlayerVariablesManager().getPlayerVariables();
 
-		for(ServerVariablesPlayer player : players){
+		for(Map.Entry<UUID, ServerVariablesPlayer> entry : players.entrySet()){
+			ServerVariablesPlayer player = entry.getValue();
 			if(player.isModified()){
 				savePlayer(player);
 			}
