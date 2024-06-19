@@ -10,8 +10,8 @@
     <packaging>jar</packaging>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
     </properties>
     <repositories>
         <repository>
@@ -27,8 +27,8 @@
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.16.5-R0.1-SNAPSHOT</version>
+            <artifactId>spigot</artifactId>
+            <version>1.21-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -53,6 +53,7 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <release>8</release>
                 </configuration>
             </plugin>
             <plugin>
