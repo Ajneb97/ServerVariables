@@ -99,7 +99,7 @@ public class MySQLConnection {
         try(Connection connection = getConnection()){
             PreparedStatement statement1 = connection.prepareStatement(
                     "CREATE TABLE IF NOT EXISTS servervariables_players" +
-                    " (UUID varchar(200) NOT NULL, " +
+                    " (UUID varchar(36) NOT NULL, " +
                     " PLAYER_NAME varchar(50), " +
                     " PRIMARY KEY ( UUID ))"
             );
@@ -107,7 +107,7 @@ public class MySQLConnection {
             PreparedStatement statement2 = connection.prepareStatement(
                     "CREATE TABLE IF NOT EXISTS servervariables_players_variables" +
                     " (ID int NOT NULL AUTO_INCREMENT, " +
-                    " UUID varchar(200) NOT NULL, " +
+                    " UUID varchar(36) NOT NULL, " +
                     " NAME varchar(100), " +
                     " VALUE text, " +
                     " PRIMARY KEY ( ID ), " +

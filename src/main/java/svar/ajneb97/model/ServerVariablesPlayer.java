@@ -1,5 +1,7 @@
 package svar.ajneb97.model;
 
+import svar.ajneb97.model.structure.Variable;
+
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -60,6 +62,14 @@ public class ServerVariablesPlayer {
             }
         }
         return null;
+    }
+
+    public String getVariableValue(String variableName, Variable variable){
+        ServerVariablesVariable v = getVariable(variableName);
+        if(v == null){
+            return variable.getInitialValue();
+        }
+        return v.getCurrentValue();
     }
 
     public void setVariable(String variableName,String newValue){

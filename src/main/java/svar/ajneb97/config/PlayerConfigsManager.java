@@ -147,7 +147,8 @@ public class PlayerConfigsManager {
 	public void savePlayers() {
 		Map<UUID, ServerVariablesPlayer> players = plugin.getPlayerVariablesManager().getPlayerVariables();
 
-		for(Map.Entry<UUID, ServerVariablesPlayer> entry : players.entrySet()){
+		Map<UUID, ServerVariablesPlayer> playersCopy = new HashMap<>(players);
+		for(Map.Entry<UUID, ServerVariablesPlayer> entry : playersCopy.entrySet()){
 			ServerVariablesPlayer player = entry.getValue();
 			if(player.isModified()){
 				savePlayer(player);

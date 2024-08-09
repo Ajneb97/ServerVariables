@@ -171,9 +171,11 @@ public class PlayerVariablesManager {
         if(plugin.getMySQLConnection() != null) {
             plugin.getMySQLConnection().updateVariable(variablesPlayer,variableName,newValue);
         }
+
+        String oldValue = variablesPlayer.getVariableValue(variableName,variable);
         variablesPlayer.setVariable(variableName,newValue);
 
-        plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(Bukkit.getPlayer(playerName),variable,newValue));
+        plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(Bukkit.getPlayer(playerName),variable,newValue,oldValue));
 
         return VariableResult.noErrors(newValue);
     }
@@ -241,16 +243,18 @@ public class PlayerVariablesManager {
         if(all){
             for(Map.Entry<UUID, ServerVariablesPlayer> entry : playerVariables.entrySet()){
                 ServerVariablesPlayer p = entry.getValue();
+                String oldValue = p.getVariableValue(name,variable);
                 if(p.resetVariable(name) && p.getName() != null){
                     Player player = Bukkit.getPlayer(p.getName());
                     if(player != null){
-                        plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(player,variable,variable.getInitialValue()));
+                        plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(player,variable,variable.getInitialValue(),oldValue));
                     }
                 }
             }
         }else{
+            String oldValue = variablesPlayer.getVariableValue(name,variable);
             if(variablesPlayer.resetVariable(name)){
-                plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(Bukkit.getPlayer(playerName),variable,variable.getInitialValue()));
+                plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(Bukkit.getPlayer(playerName),variable,variable.getInitialValue(),oldValue));
             }
         }
 

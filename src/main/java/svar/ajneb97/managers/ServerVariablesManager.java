@@ -99,14 +99,17 @@ public class ServerVariablesManager {
         ServerVariablesVariable currentVariable = getCurrentVariable(variable.getName());
 
         //If not exists, create it
+        String oldValue;
         if(currentVariable == null){
+            oldValue = variable.getInitialValue();
             currentVariable = new ServerVariablesVariable(variableName,newValue);
             variables.add(currentVariable);
         }else{
+            oldValue = currentVariable.getCurrentValue();
             currentVariable.setCurrentValue(newValue);
         }
 
-        plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(null, variable, newValue));
+        plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(null, variable, newValue, oldValue));
 
         return VariableResult.noErrors(newValue);
     }
@@ -151,14 +154,16 @@ public class ServerVariablesManager {
             return VariableResult.error(config.getString("messages.variableResetInvalidTypePlayer"));
         }
 
+        String oldValue = variable.getInitialValue();
         for(int i=0;i<variables.size();i++){
             if(variables.get(i).getVariableName().equals(name)){
+                oldValue = variables.get(i).getCurrentValue();
                 variables.remove(i);
                 break;
             }
         }
 
-        plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(null,variable,variable.getInitialValue()));
+        plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(null,variable,variable.getInitialValue(),oldValue));
 
         return VariableResult.noErrors(null);
     }
