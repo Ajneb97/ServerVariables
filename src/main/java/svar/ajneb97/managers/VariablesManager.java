@@ -8,6 +8,8 @@ import svar.ajneb97.model.structure.Limitations;
 import svar.ajneb97.model.structure.ValueType;
 import svar.ajneb97.model.structure.Variable;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,8 +88,8 @@ public class VariablesManager {
                 maxValue = limitations.getMaxValue()+"";
                 minValue = limitations.getMinValue()+"";
             }else{
-                maxValue = (int)limitations.getMaxValue()+"";
-                minValue = (int)limitations.getMinValue()+"";
+                maxValue = (long)limitations.getMaxValue()+"";
+                minValue = (long)limitations.getMinValue()+"";
             }
             if(value > limitations.getMaxValue()){
                 return VariableResult.error(config.getString("messages.variableLimitationOutOfRangeMax")
@@ -106,6 +108,15 @@ public class VariablesManager {
         }
 
         return VariableResult.noErrors(null);
+    }
+
+    public String variableTransformations(Variable variable, String newValue){
+        if(!variable.getValueType().equals(ValueType.DOUBLE)){
+            return newValue;
+        }
+        int maxDecimals = variable.getLimitations().getMaxDecimals();
+
+        return new BigDecimal(newValue).setScale(maxDecimals, RoundingMode.HALF_UP).toString();
     }
 
     public String getDisplayFromVariableValue(Variable variable,String value){

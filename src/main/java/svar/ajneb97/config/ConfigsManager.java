@@ -61,6 +61,9 @@ public class ConfigsManager {
 					if(config.contains(path+".limitations.max_characters")){
 						limitations.setMaxCharacters(config.getInt(path+".limitations.max_characters"));
 					}
+					if(config.contains(path+".limitations.max_decimals")){
+						limitations.setMaxDecimals(config.getInt(path+".limitations.max_decimals"));
+					}
 
 					Variable variable = new Variable(key, variableType, valueType, initialValue, possibleValues, limitations);
 					variables.add(variable);

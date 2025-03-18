@@ -134,7 +134,7 @@ public class PlayerVariablesManager {
             if(value.contains(".") || valueType == ValueType.DOUBLE){
                 return setVariable(playerName,variableName,newValue+"");
             }else{
-                return setVariable(playerName,variableName,((int)newValue)+"");
+                return setVariable(playerName,variableName,((long)newValue)+"");
             }
         }catch(NumberFormatException e){
             return add ? VariableResult.error(config.getString("messages.variableAddError")) :
@@ -167,6 +167,9 @@ public class PlayerVariablesManager {
             //The player hasn't joined the server and can't set data.
             return VariableResult.error(config.getString("messages.playerNoData"));
         }
+
+        // Transformations
+        newValue = variablesManager.variableTransformations(variable,newValue);
 
         if(plugin.getMySQLConnection() != null) {
             plugin.getMySQLConnection().updateVariable(variablesPlayer,variableName,newValue);

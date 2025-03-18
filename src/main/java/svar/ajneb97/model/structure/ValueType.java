@@ -8,7 +8,7 @@ public enum ValueType {
     public static boolean isValid(ValueType type,String currentValue){
         if(type.equals(ValueType.INTEGER)){
             try{
-                Integer.parseInt(currentValue);
+                Long.parseLong(currentValue);
             }catch(Exception e){
                 return false;
             }

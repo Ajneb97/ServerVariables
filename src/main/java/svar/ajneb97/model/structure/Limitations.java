@@ -4,11 +4,13 @@ public class Limitations {
     private double minValue;
     private double maxValue;
     private int maxCharacters;
+    private int maxDecimals;
 
     public Limitations() {
-        this.minValue = -Integer.MAX_VALUE;
-        this.maxValue = Integer.MAX_VALUE;
+        this.minValue = -Double.MAX_VALUE;
+        this.maxValue = Double.MAX_VALUE;
         this.maxCharacters = Integer.MAX_VALUE;
+        this.maxDecimals = 5;
     }
 
     public double getMinValue() {
@@ -33,5 +35,13 @@ public class Limitations {
 
     public void setMaxCharacters(int maxCharacters) {
         this.maxCharacters = maxCharacters;
+    }
+
+    public int getMaxDecimals() {
+        return maxDecimals;
+    }
+
+    public void setMaxDecimals(int maxDecimals) {
+        this.maxDecimals = maxDecimals;
     }
 }

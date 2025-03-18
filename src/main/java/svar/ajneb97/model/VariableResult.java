@@ -1,6 +1,5 @@
 package svar.ajneb97.model;
 
-import svar.ajneb97.model.structure.ValueType;
 import svar.ajneb97.model.structure.Variable;
 
 public class VariableResult {

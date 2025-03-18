@@ -67,8 +67,8 @@ public class ServerVariablesManager {
                 return setVariable(variableName,newValue+"");
             }else{
                 //Integer
-                int numericValue = Integer.parseInt(value);
-                int newValue = add ? Integer.parseInt(result.getResultValue())+numericValue : Integer.parseInt(result.getResultValue())-numericValue;
+                long numericValue = Long.parseLong(value);
+                long newValue = add ? Long.parseLong(result.getResultValue())+numericValue : Long.parseLong(result.getResultValue())-numericValue;
                 return setVariable(variableName,newValue+"");
             }
         }catch(NumberFormatException e){
@@ -97,6 +97,9 @@ public class ServerVariablesManager {
         }
 
         ServerVariablesVariable currentVariable = getCurrentVariable(variable.getName());
+
+        // Transformations
+        newValue = variablesManager.variableTransformations(variable,newValue);
 
         //If not exists, create it
         String oldValue;
