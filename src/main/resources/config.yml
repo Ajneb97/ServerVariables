@@ -8,6 +8,13 @@ config:
     username: root
     password: root
     database: servervariables
+    pool:
+      connectionTimeout: 5000
+    advanced:
+      verifyServerCertificate: false
+      useSSL: true
+      allowPublicKeyRetrieval: true
+
 messages:
   prefix: "&8[&a&lServerVariables&8] "
   commandSetError: "&cYou need to use: &7/svar set <variable> <value> (optional)<player> (optional)silent:true"

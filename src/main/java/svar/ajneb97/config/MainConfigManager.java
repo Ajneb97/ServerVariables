@@ -66,6 +66,13 @@ public class MainConfigManager {
 		Path pathConfig = Paths.get(configFile.getRoute());
 		try{
 			String text = new String(Files.readAllBytes(pathConfig));
+			if(!text.contains("verifyServerCertificate:")){
+				getConfig().set("config.mysql_database.pool.connectionTimeout",5000);
+				getConfig().set("config.mysql_database.advanced.verifyServerCertificate",false);
+				getConfig().set("config.mysql_database.advanced.useSSL",true);
+				getConfig().set("config.mysql_database.advanced.allowPublicKeyRetrieval",true);
+				saveConfig();
+			}
 			if(!text.contains("silent_commands_hide_errors:")){
 				getConfig().set("config.silent_commands_hide_errors",false);
 				saveConfig();

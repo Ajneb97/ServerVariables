@@ -18,11 +18,6 @@ public class MySQLConnection {
 
     private ServerVariables plugin;
     private HikariConnection connection;
-    private String host;
-    private String database;
-    private String username;
-    private String password;
-    private int port;
 
     public MySQLConnection(ServerVariables plugin){
         this.plugin = plugin;
@@ -31,12 +26,7 @@ public class MySQLConnection {
     public void setupMySql(){
         FileConfiguration config = plugin.getConfigsManager().getMainConfigManager().getConfigFile().getConfig();
         try {
-            host = config.getString("config.mysql_database.host");
-            port = Integer.valueOf(config.getString("config.mysql_database.port"));
-            database = config.getString("config.mysql_database.database");
-            username = config.getString("config.mysql_database.username");
-            password = config.getString("config.mysql_database.password");
-            connection = new HikariConnection(host,port,database,username,password);
+            connection = new HikariConnection(config);
             connection.getHikari().getConnection();
             createTables();
             loadData();
@@ -44,11 +34,6 @@ public class MySQLConnection {
         }catch(Exception e) {
             Bukkit.getConsoleSender().sendMessage(MessagesManager.getColoredMessage(plugin.prefix+" &cError while connecting to the Database."));
         }
-    }
-
-
-    public String getDatabase() {
-        return this.database;
     }
 
     public Connection getConnection() {
