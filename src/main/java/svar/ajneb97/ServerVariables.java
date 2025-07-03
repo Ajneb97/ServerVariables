@@ -13,13 +13,15 @@ import svar.ajneb97.managers.*;
 import svar.ajneb97.managers.dependencies.Metrics;
 import svar.ajneb97.model.internal.UpdateCheckerResult;
 import svar.ajneb97.tasks.DataSaveTask;
+import svar.ajneb97.utils.ServerVersion;
 
 import java.io.File;
 
 
 public class ServerVariables extends JavaPlugin {
 
-    public String prefix = "&8[&a&lServerVariables&8]";
+    public String prefix;
+    public static ServerVersion serverVersion;
     private PluginDescriptionFile pdfFile = getDescription();
     public String version = pdfFile.getVersion();
 
@@ -35,6 +37,9 @@ public class ServerVariables extends JavaPlugin {
     private MySQLConnection mySQLConnection;
 
     public void onEnable(){
+        setVersion();
+        setPrefix();
+
         this.variablesManager = new VariablesManager(this);
         this.serverVariablesManager = new ServerVariablesManager(this);
         this.playerVariablesManager = new PlayerVariablesManager(this);
@@ -66,6 +71,45 @@ public class ServerVariables extends JavaPlugin {
         this.configsManager.saveServerData();
         this.configsManager.savePlayerData();
         Bukkit.getConsoleSender().sendMessage(MessagesManager.getColoredMessage(prefix+" &eHas been disabled! &fVersion: "+version));
+    }
+
+    public void setPrefix(){
+        prefix = MessagesManager.getColoredMessage("&8[&a&lServerVariables&8]");
+    }
+
+    public void setVersion(){
+        String packageName = Bukkit.getServer().getClass().getPackage().getName();
+        String bukkitVersion = Bukkit.getServer().getBukkitVersion().split("-")[0];
+        switch(bukkitVersion){
+            case "1.20.5":
+            case "1.20.6":
+                serverVersion = ServerVersion.v1_20_R4;
+                break;
+            case "1.21":
+            case "1.21.1":
+                serverVersion = ServerVersion.v1_21_R1;
+                break;
+            case "1.21.2":
+            case "1.21.3":
+                serverVersion = ServerVersion.v1_21_R2;
+                break;
+            case "1.21.4":
+                serverVersion = ServerVersion.v1_21_R3;
+                break;
+            case "1.21.5":
+                serverVersion = ServerVersion.v1_21_R4;
+                break;
+            case "1.21.6":
+            case "1.21.7":
+                serverVersion = ServerVersion.v1_21_R5;
+                break;
+            default:
+                try{
+                    serverVersion = ServerVersion.valueOf(packageName.replace("org.bukkit.craftbukkit.", ""));
+                }catch(Exception e){
+                    serverVersion = ServerVersion.v1_21_R5;
+                }
+        }
     }
 
     public VariablesManager getVariablesManager() {

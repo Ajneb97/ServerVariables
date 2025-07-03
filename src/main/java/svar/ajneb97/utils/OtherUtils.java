@@ -1,6 +1,16 @@
 package svar.ajneb97.utils;
 
+import svar.ajneb97.ServerVariables;
+
 public class OtherUtils {
+
+    public static boolean isNew() {
+        ServerVersion serverVersion = ServerVariables.serverVersion;
+        if(serverVersion.serverVersionGreaterEqualThan(serverVersion,ServerVersion.v1_16_R1)){
+            return true;
+        }
+        return false;
+    }
 
     public static String getFileExtension(String filePath) {
         int lastIndex = filePath.lastIndexOf(".");

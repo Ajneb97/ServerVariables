@@ -3,6 +3,7 @@ package svar.ajneb97.managers;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import svar.ajneb97.utils.OtherUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,21 +25,20 @@ public class MessagesManager {
         }
     }
 
-    public static String getColoredMessage(String text) {
-        if(Bukkit.getVersion().contains("1.16") || Bukkit.getVersion().contains("1.17") || Bukkit.getVersion().contains("1.18")
-                || Bukkit.getVersion().contains("1.19") || Bukkit.getVersion().contains("1.20")) {
+    public static String getColoredMessage(String message) {
+        if(OtherUtils.isNew()) {
             Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
-            Matcher match = pattern.matcher(text);
+            Matcher match = pattern.matcher(message);
 
             while(match.find()) {
-                String color = text.substring(match.start(),match.end());
-                text = text.replace(color, ChatColor.of(color)+"");
+                String color = message.substring(match.start(),match.end());
+                message = message.replace(color, ChatColor.of(color)+"");
 
-                match = pattern.matcher(text);
+                match = pattern.matcher(message);
             }
         }
 
-        text = ChatColor.translateAlternateColorCodes('&', text);
-        return text;
+        message = ChatColor.translateAlternateColorCodes('&', message);
+        return message;
     }
 }
