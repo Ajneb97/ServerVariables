@@ -1,6 +1,5 @@
 package svar.ajneb97.managers;
 
-import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -118,7 +117,7 @@ public class PlayerVariablesManager {
         }
 
         //Value must be a number
-        if(!NumberUtils.isNumber(value)){
+        if(!MathUtils.isParsable(value)){
             return VariableResult.error(config.getString("messages.invalidValue"));
         }
 

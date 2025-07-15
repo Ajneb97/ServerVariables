@@ -1,6 +1,5 @@
 package svar.ajneb97.config;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -100,8 +99,6 @@ public class CustomConfig {
     }
 
     public static YamlConfiguration loadConfiguration(@NotNull File file) {
-        Validate.notNull(file, "File cannot be null");
-
         YamlConfiguration config = new YamlConfiguration();
 
         try {

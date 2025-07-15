@@ -1,6 +1,5 @@
 package svar.ajneb97.managers;
 
-import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.configuration.file.FileConfiguration;
 import svar.ajneb97.ServerVariables;
 import svar.ajneb97.api.VariableChangeEvent;
@@ -51,7 +50,7 @@ public class ServerVariablesManager {
             return VariableResult.error(result.getErrorMessage());
         }
 
-        if(!NumberUtils.isNumber(value)){
+        if(!MathUtils.isParsable(value)){
             return VariableResult.error(config.getString("messages.invalidValue"));
         }
 
