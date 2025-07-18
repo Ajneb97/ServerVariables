@@ -77,6 +77,10 @@ public class ServerVariablesExpansion extends PlaceholderExpansion {
             }
             String variableName = identifier.replace("display_", "");
             return ServerVariablesAPI.getPlayerVariableDisplay(player.getName(),variableName);
+        }else if(identifier.startsWith("initial_value_")){
+            // %servervariables_initial_value_<variable>%
+            String variableName = identifier.replace("initial_value_", "");
+            return ServerVariablesAPI.getVariableInitialValue(variableName);
         }
 
         return null;

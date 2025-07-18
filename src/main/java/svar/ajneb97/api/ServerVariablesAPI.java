@@ -4,6 +4,7 @@ import svar.ajneb97.ServerVariables;
 import svar.ajneb97.managers.VariablesManager;
 import svar.ajneb97.model.VariableResult;
 import svar.ajneb97.model.ServerVariablesPlayer;
+import svar.ajneb97.model.structure.Variable;
 
 import java.util.UUID;
 
@@ -27,6 +28,11 @@ public class ServerVariablesAPI {
         return result.getResultValue();
     }
 
+    public static String getPlayerVariableValue(UUID uuid, String variableName){
+        VariableResult result = plugin.getPlayerVariablesManager().getVariableValue(uuid, variableName, false);
+        return result.getResultValue();
+    }
+
     public static String getPlayerVariableValue(String playerName, String variableName){
         VariableResult result = plugin.getPlayerVariablesManager().getVariableValue(playerName, variableName, false);
         return result.getResultValue();
@@ -40,11 +46,27 @@ public class ServerVariablesAPI {
         return result.getResultValue();
     }
 
-    public ServerVariablesPlayer getPlayerByName(String playerName){
+    public static VariableResult setPlayerVariableValue(UUID uuid, String variableName, String value){
+        return plugin.getPlayerVariablesManager().setVariable(uuid,variableName,value);
+    }
+
+    public static VariableResult setPlayerVariableValue(String playerName, String variableName, String value){
+        return plugin.getPlayerVariablesManager().setVariable(playerName,variableName,value);
+    }
+
+    public static ServerVariablesPlayer getPlayerByName(String playerName){
         return plugin.getPlayerVariablesManager().getPlayerByName(playerName);
     }
 
-    public ServerVariablesPlayer getPlayerByUUID(String uuid){
-        return plugin.getPlayerVariablesManager().getPlayerByUUID(UUID.fromString(uuid));
+    public static ServerVariablesPlayer getPlayerByUUID(UUID uuid){
+        return plugin.getPlayerVariablesManager().getPlayerByUUID(uuid);
+    }
+
+    public static String getVariableInitialValue(String variableName){
+        Variable variable = plugin.getVariablesManager().getVariable(variableName);
+        if(variable == null){
+            return null;
+        }
+        return variable.getInitialValue();
     }
 }

@@ -141,8 +141,17 @@ public class PlayerVariablesManager {
         }
     }
 
+    public VariableResult setVariable(UUID uuid, String variableName, String newValue){
+        ServerVariablesPlayer variablesPlayer = getPlayerByUUID(uuid);
+        return setVariable(variablesPlayer,variableName,newValue);
+    }
 
     public VariableResult setVariable(String playerName, String variableName, String newValue){
+        ServerVariablesPlayer variablesPlayer = getPlayerByName(playerName);
+        return setVariable(variablesPlayer,variableName,newValue);
+    }
+
+    private VariableResult setVariable(ServerVariablesPlayer variablesPlayer, String variableName, String newValue){
         FileConfiguration config = plugin.getConfig();
         VariablesManager variablesManager = plugin.getVariablesManager();
         Variable variable = variablesManager.getVariable(variableName);
@@ -161,7 +170,6 @@ public class PlayerVariablesManager {
             return VariableResult.error(config.getString("messages.variableSetInvalidTypeGlobal"));
         }
 
-        ServerVariablesPlayer variablesPlayer = getPlayerByName(playerName);
         if(variablesPlayer == null){
             //The player hasn't joined the server and can't set data.
             return VariableResult.error(config.getString("messages.playerNoData"));
@@ -177,15 +185,24 @@ public class PlayerVariablesManager {
         String oldValue = variablesPlayer.getVariableValue(variableName,variable);
         variablesPlayer.setVariable(variableName,newValue);
 
-        plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(Bukkit.getPlayer(playerName),variable,newValue,oldValue));
+        plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(Bukkit.getPlayer(variablesPlayer.getName()),variable,newValue,oldValue));
 
         return VariableResult.noErrors(newValue);
     }
 
-    public VariableResult getVariableValue(String playerName, String name, boolean modifying){
+    public VariableResult getVariableValue(UUID uuid, String variableName, boolean modifying){
+        ServerVariablesPlayer variablesPlayer = getPlayerByUUID(uuid);
+        return getVariableValue(variablesPlayer,variableName,modifying);
+    }
+
+    public VariableResult getVariableValue(String playerName, String variableName, boolean modifying){
+        ServerVariablesPlayer variablesPlayer = getPlayerByName(playerName);
+        return getVariableValue(variablesPlayer,variableName,modifying);
+    }
+
+    public VariableResult getVariableValue(ServerVariablesPlayer variablesPlayer, String name, boolean modifying){
         FileConfiguration config = plugin.getConfig();
 
-        ServerVariablesPlayer variablesPlayer = getPlayerByName(playerName);
         Variable variable = plugin.getVariablesManager().getVariable(name);
 
         if(variable == null){

@@ -15,6 +15,7 @@ public class MainConfigManager {
 	private ServerVariables plugin;
 	private CustomConfig configFile;
 
+	private boolean updateNotify;
 	private boolean isMySQL;
 	private boolean silentCommandsHideErrors;
 
@@ -42,6 +43,7 @@ public class MainConfigManager {
 		dataSaveTask = new DataSaveTask(plugin);
 		dataSaveTask.start(config.getInt("config.data_save_time"));
 
+		updateNotify = config.getBoolean("update_notify");
 		isMySQL = config.getBoolean("config.mysql_database.enabled");
 		silentCommandsHideErrors = config.getBoolean("config.silent_commands_hide_errors");
 	}
@@ -52,6 +54,10 @@ public class MainConfigManager {
 
 	public boolean isMySQL(){
 		return isMySQL;
+	}
+
+	public boolean isUpdateNotify() {
+		return updateNotify;
 	}
 
 	public FileConfiguration getConfig(){
@@ -66,6 +72,10 @@ public class MainConfigManager {
 		Path pathConfig = Paths.get(configFile.getRoute());
 		try{
 			String text = new String(Files.readAllBytes(pathConfig));
+			if(!text.contains("update_notify:")){
+				getConfig().set("config.update_notify",true);
+				saveConfig();
+			}
 			if(!text.contains("verifyServerCertificate:")){
 				getConfig().set("config.mysql_database.pool.connectionTimeout",5000);
 				getConfig().set("config.mysql_database.advanced.verifyServerCertificate",false);
