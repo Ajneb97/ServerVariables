@@ -20,7 +20,7 @@ import java.io.File;
 
 public class ServerVariables extends JavaPlugin {
 
-    public String prefix;
+    public static String prefix;
     public static ServerVersion serverVersion;
     private PluginDescriptionFile pdfFile = getDescription();
     public String version = pdfFile.getVersion();

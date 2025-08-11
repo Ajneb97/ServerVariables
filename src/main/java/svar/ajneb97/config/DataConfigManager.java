@@ -1,26 +1,21 @@
 package svar.ajneb97.config;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import svar.ajneb97.ServerVariables;
+import svar.ajneb97.config.model.CommonConfig;
 import svar.ajneb97.managers.ServerVariablesManager;
 import svar.ajneb97.model.ServerVariablesVariable;
 
 public class DataConfigManager {
 
 	private ServerVariables plugin;
-	private CustomConfig configFile;
+	private CommonConfig configFile;
 	
 	public DataConfigManager(ServerVariables plugin) {
 		this.plugin = plugin;
-		this.configFile = new CustomConfig("data.yml",plugin,null);
+		this.configFile = new CommonConfig("data.yml",plugin,null,false);
 		configFile.registerConfig();
 	}
 	

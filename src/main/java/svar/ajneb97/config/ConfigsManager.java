@@ -2,6 +2,7 @@ package svar.ajneb97.config;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import svar.ajneb97.ServerVariables;
+import svar.ajneb97.config.model.CommonConfig;
 import svar.ajneb97.model.structure.Limitations;
 import svar.ajneb97.model.structure.ValueType;
 import svar.ajneb97.model.structure.Variable;
@@ -12,7 +13,7 @@ import java.util.List;
 
 public class ConfigsManager {
 
-	private PlayerConfigsManager playerConfigsManager;
+	private PlayersConfigsManager playerConfigsManager;
 	private DataConfigManager dataConfigManager;
 	private MainConfigManager mainConfigManager;
 	private VariablesFolderConfigManager variablesFolderConfigManager;
@@ -21,7 +22,7 @@ public class ConfigsManager {
 	public ConfigsManager(ServerVariables plugin) {
 		this.plugin = plugin;
 		this.mainConfigManager = new MainConfigManager(plugin);
-		this.playerConfigsManager = new PlayerConfigsManager(plugin);
+		this.playerConfigsManager = new PlayersConfigsManager(plugin,"players");
 		this.dataConfigManager = new DataConfigManager(plugin);
 		this.variablesFolderConfigManager = new VariablesFolderConfigManager(plugin,"variables");
 	}
@@ -36,9 +37,9 @@ public class ConfigsManager {
 
 	public void configureVariables(){
 		ArrayList<Variable> variables = new ArrayList<>();
-		ArrayList<CustomConfig> variablesConfigs = getVariablesConfigs();
+		ArrayList<CommonConfig> variablesConfigs = getVariablesConfigs();
 
-		for(CustomConfig customConfig : variablesConfigs){
+		for(CommonConfig customConfig : variablesConfigs){
 			FileConfiguration config = customConfig.getConfig();
 			if(config.contains("variables")){
 				for(String key : config.getConfigurationSection("variables").getKeys(false)){
@@ -64,6 +65,9 @@ public class ConfigsManager {
 					if(config.contains(path+".limitations.max_decimals")){
 						limitations.setMaxDecimals(config.getInt(path+".limitations.max_decimals"));
 					}
+					if(config.contains(path+".limitations.manage_out_of_range")){
+						limitations.setManageOutOfRange(config.getBoolean(path+".limitations.manage_out_of_range"));
+					}
 
 					Variable variable = new Variable(key, variableType, valueType, initialValue, possibleValues, limitations);
 					variables.add(variable);
@@ -73,7 +77,7 @@ public class ConfigsManager {
 		plugin.getVariablesManager().setVariables(variables);
 	}
 
-	public PlayerConfigsManager getPlayerConfigsManager() {
+	public PlayersConfigsManager getPlayerConfigsManager() {
 		return playerConfigsManager;
 	}
 
@@ -85,8 +89,8 @@ public class ConfigsManager {
 		return mainConfigManager;
 	}
 
-	private ArrayList<CustomConfig> getVariablesConfigs() {
-		ArrayList<CustomConfig> configs = new ArrayList<CustomConfig>();
+	private ArrayList<CommonConfig> getVariablesConfigs() {
+		ArrayList<CommonConfig> configs = new ArrayList<>();
 
 		configs.add(mainConfigManager.getConfigFile());
 		configs.addAll(variablesFolderConfigManager.getConfigs());
@@ -94,18 +98,21 @@ public class ConfigsManager {
 		return configs;
 	}
 
-	public void reloadConfigs(){
-		mainConfigManager.reload();
-		variablesFolderConfigManager.reloadConfigs();
+	public boolean reloadConfigs(){
+		if(!mainConfigManager.reloadConfig()){
+			return false;
+		}
+
 		configureVariables();
 
 		saveServerData();
 		savePlayerData();
+		return true;
 	}
 
 	public void savePlayerData(){
 		if(plugin.getMySQLConnection() == null){
-			playerConfigsManager.savePlayers();
+			playerConfigsManager.saveConfigs();
 		}
 	}
 

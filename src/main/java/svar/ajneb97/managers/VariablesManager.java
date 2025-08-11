@@ -39,7 +39,7 @@ public class VariablesManager {
     }
 
     public VariableResult checkVariableCommon(String variableName, String newValue){
-        FileConfiguration config = plugin.getConfig();
+        FileConfiguration config = plugin.getConfigsManager().getMainConfigManager().getConfig();
         Variable variable = plugin.getVariablesManager().getVariable(variableName);
         if(variable == null){
             //Variable doesn't exist
@@ -78,6 +78,8 @@ public class VariablesManager {
             }
         }
 
+        String resultValue = null;
+
         //Check limitations
         Limitations limitations = variable.getLimitations();
         if(variable.isNumerical()){
@@ -92,12 +94,18 @@ public class VariablesManager {
                 minValue = (long)limitations.getMinValue()+"";
             }
             if(value > limitations.getMaxValue()){
-                return VariableResult.error(config.getString("messages.variableLimitationOutOfRangeMax")
-                        .replace("%value%",maxValue));
+                if(!limitations.isManageOutOfRange()){
+                    return VariableResult.error(config.getString("messages.variableLimitationOutOfRangeMax")
+                            .replace("%value%",maxValue));
+                }
+                resultValue = maxValue;
             }
             if(value < limitations.getMinValue()){
-                return VariableResult.error(config.getString("messages.variableLimitationOutOfRangeMin")
-                        .replace("%value%",minValue));
+                if(!limitations.isManageOutOfRange()){
+                    return VariableResult.error(config.getString("messages.variableLimitationOutOfRangeMin")
+                            .replace("%value%",minValue));
+                }
+                resultValue = minValue;
             }
         }else{
             int maxCharacters = limitations.getMaxCharacters();
@@ -107,7 +115,7 @@ public class VariablesManager {
             }
         }
 
-        return VariableResult.noErrors(null);
+        return VariableResult.noErrors(resultValue);
     }
 
     public String variableTransformations(Variable variable, String newValue){

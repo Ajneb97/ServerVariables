@@ -2,6 +2,7 @@ package svar.ajneb97.config;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import svar.ajneb97.ServerVariables;
+import svar.ajneb97.config.model.CommonConfig;
 import svar.ajneb97.managers.MessagesManager;
 import svar.ajneb97.tasks.DataSaveTask;
 
@@ -13,7 +14,7 @@ import java.nio.file.Paths;
 public class MainConfigManager {
 
 	private ServerVariables plugin;
-	private CustomConfig configFile;
+	private CommonConfig configFile;
 
 	private boolean updateNotify;
 	private boolean isMySQL;
@@ -21,14 +22,9 @@ public class MainConfigManager {
 
 	public MainConfigManager(ServerVariables plugin) {
 		this.plugin = plugin;
-		this.configFile = new CustomConfig("config.yml",plugin,null);
+		this.configFile = new CommonConfig("config.yml",plugin,null,false);
 		configFile.registerConfig();
 		checkMessagesUpdate();
-	}
-
-	public void reload(){
-		configFile.reloadConfig();
-		configure();
 	}
 	
 	public void configure() {
@@ -48,7 +44,15 @@ public class MainConfigManager {
 		silentCommandsHideErrors = config.getBoolean("config.silent_commands_hide_errors");
 	}
 
-	public CustomConfig getConfigFile() {
+	public boolean reloadConfig(){
+		if(!configFile.reloadConfig()){
+			return false;
+		}
+		configure();
+		return true;
+	}
+
+	public CommonConfig getConfigFile() {
 		return configFile;
 	}
 

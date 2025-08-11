@@ -110,7 +110,7 @@ public class PlayerVariablesManager {
     }
 
     public VariableResult modifyVariable(String playerName, String variableName, String value, boolean add){
-        FileConfiguration config = plugin.getConfig();
+        FileConfiguration config = plugin.getConfigsManager().getMainConfigManager().getConfig();
         VariableResult result = getVariableValue(playerName, variableName, true);
         if(result.isError()){
             return VariableResult.error(result.getErrorMessage());
@@ -152,12 +152,17 @@ public class PlayerVariablesManager {
     }
 
     private VariableResult setVariable(ServerVariablesPlayer variablesPlayer, String variableName, String newValue){
-        FileConfiguration config = plugin.getConfig();
+        FileConfiguration config = plugin.getConfigsManager().getMainConfigManager().getConfig();
         VariablesManager variablesManager = plugin.getVariablesManager();
         Variable variable = variablesManager.getVariable(variableName);
         VariableResult checkCommon = variablesManager.checkVariableCommon(variableName,newValue);
         if(checkCommon.isError()){
             return checkCommon;
+        }
+
+        //Verify if resultValue exists
+        if(checkCommon.getResultValue() != null){
+            newValue = checkCommon.getResultValue();
         }
 
         //If newValue is null, setting variable with initial value
@@ -201,7 +206,7 @@ public class PlayerVariablesManager {
     }
 
     public VariableResult getVariableValue(ServerVariablesPlayer variablesPlayer, String name, boolean modifying){
-        FileConfiguration config = plugin.getConfig();
+        FileConfiguration config = plugin.getConfigsManager().getMainConfigManager().getConfig();
 
         Variable variable = plugin.getVariablesManager().getVariable(name);
 
@@ -232,7 +237,7 @@ public class PlayerVariablesManager {
     }
 
     public VariableResult resetVariable(String playerName, String name, boolean all){
-        FileConfiguration config = plugin.getConfig();
+        FileConfiguration config = plugin.getConfigsManager().getMainConfigManager().getConfig();
 
         ServerVariablesPlayer variablesPlayer = getPlayerByName(playerName);
         Variable variable = plugin.getVariablesManager().getVariable(name);

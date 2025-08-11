@@ -30,7 +30,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 			return false;
 		}
 
-		FileConfiguration config = plugin.getConfig();
+		FileConfiguration config = plugin.getConfigsManager().getMainConfigManager().getConfig();
 		MessagesManager msgManager = plugin.getMessagesManager();
 		if(args.length >= 1){
 			if(args[0].equalsIgnoreCase("set")){
@@ -265,7 +265,11 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 
 	public void reload(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager){
 		// /servervariables reload
-		plugin.getConfigsManager().reloadConfigs();
+		if(!plugin.getConfigsManager().reloadConfigs()){
+			sender.sendMessage(ServerVariables.prefix+MessagesManager.getColoredMessage("&cThere was an error reloading the config, check the console."));
+			return;
+		}
+
 		msgManager.sendMessage(sender,config.getString("messages.pluginReloaded"),true);
 	}
 
