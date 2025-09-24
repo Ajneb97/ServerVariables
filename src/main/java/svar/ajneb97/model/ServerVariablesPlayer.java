@@ -1,18 +1,22 @@
 package svar.ajneb97.model;
 
+import org.bukkit.Bukkit;
+import svar.ajneb97.model.structure.ListVariable;
+import svar.ajneb97.model.structure.StringVariable;
 import svar.ajneb97.model.structure.Variable;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class ServerVariablesPlayer {
 
     private UUID uuid;
     private String name;
-    private ArrayList<ServerVariablesVariable> variables;
+    private Map<String,ServerVariablesVariable> variables;
     private boolean modified;
 
-    public ServerVariablesPlayer(UUID uuid, String name, ArrayList<ServerVariablesVariable> variables) {
+    public ServerVariablesPlayer(UUID uuid, String name, Map<String,ServerVariablesVariable> variables) {
         this.uuid = uuid;
         this.name = name;
         this.variables = variables;
@@ -43,54 +47,74 @@ public class ServerVariablesPlayer {
         this.name = name;
     }
 
-    public ArrayList<ServerVariablesVariable> getVariables() {
+    public Map<String, ServerVariablesVariable> getVariables() {
         return variables;
     }
 
-    public void setVariables(ArrayList<ServerVariablesVariable> variables) {
+    public void setVariables(Map<String, ServerVariablesVariable> variables) {
         this.variables = variables;
     }
 
     public void addVariable(ServerVariablesVariable variable){
-        variables.add(variable);
+        variables.put(variable.getVariableName(),variable);
     }
 
-    public ServerVariablesVariable getVariable(String variableName){
-        for(ServerVariablesVariable v : variables){
-            if(v.getVariableName().equals(variableName)){
-                return v;
-            }
-        }
-        return null;
+    public ServerVariablesVariable getCurrentVariable(String variableName){
+        return variables.get(variableName);
     }
 
-    public String getVariableValue(String variableName, Variable variable){
-        ServerVariablesVariable v = getVariable(variableName);
+    public String getVariableStringValue(String variableName, StringVariable variable){
+        ServerVariablesStringVariable v = (ServerVariablesStringVariable) getCurrentVariable(variableName);
         if(v == null){
             return variable.getInitialValue();
         }
         return v.getCurrentValue();
     }
 
-    public void setVariable(String variableName,String newValue){
-        ServerVariablesVariable v = getVariable(variableName);
+    public List<String> getVariableListValue(String variableName, ListVariable variable){
+        ServerVariablesListVariable v = (ServerVariablesListVariable) getCurrentVariable(variableName);
         if(v == null){
-            v = new ServerVariablesVariable(variableName,newValue);
-            variables.add(v);
+            return variable.getInitialValue();
+        }
+        return v.getCurrentValue();
+    }
+
+    public Object getVariableValue(String variableName, Variable variable){
+        ServerVariablesVariable v = getCurrentVariable(variableName);
+        if(v == null){
+            return variable.getInitialValue();
+        }
+        return v.getCurrentValue();
+    }
+
+    public void setVariableString(String variableName,String newValue){
+        ServerVariablesStringVariable v = (ServerVariablesStringVariable) getCurrentVariable(variableName);
+        if(v == null){
+            v = new ServerVariablesStringVariable(variableName,newValue);
+            variables.put(v.getVariableName(),v);
         }else{
             v.setCurrentValue(newValue);
         }
         modified = true;
     }
 
-    public boolean resetVariable(String variableName){
-        for(int i=0;i<variables.size();i++){
-            if(variables.get(i).getVariableName().equals(variableName)){
-                variables.remove(i);
-                modified = true;
-                return true;
-            }
+    public void setVariableList(String variableName,String newValue){
+        ServerVariablesStringVariable v = (ServerVariablesStringVariable) getCurrentVariable(variableName);
+        if(v == null){
+            v = new ServerVariablesStringVariable(variableName,newValue);
+            variables.put(v.getVariableName(),v);
+        }else{
+            v.setCurrentValue(newValue);
         }
-        return false;
+        modified = true;
+    }
+
+    public ServerVariablesVariable resetVariable(String variableName){
+        ServerVariablesVariable removed = variables.remove(variableName);
+
+        if(removed != null){
+            modified = true;
+        }
+        return removed;
     }
 }

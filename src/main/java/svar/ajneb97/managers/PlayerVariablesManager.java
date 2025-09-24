@@ -1,20 +1,12 @@
 package svar.ajneb97.managers;
 
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import svar.ajneb97.ServerVariables;
-import svar.ajneb97.api.VariableChangeEvent;
 import svar.ajneb97.database.MySQLConnection;
-import svar.ajneb97.model.VariableResult;
+import svar.ajneb97.model.ListVariableResult;
+import svar.ajneb97.model.StringVariableResult;
 import svar.ajneb97.model.ServerVariablesPlayer;
-import svar.ajneb97.model.ServerVariablesVariable;
-import svar.ajneb97.model.structure.ValueType;
-import svar.ajneb97.model.structure.Variable;
-import svar.ajneb97.model.structure.VariableType;
-import svar.ajneb97.utils.MathUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -69,7 +61,7 @@ public class PlayerVariablesManager {
         playerVariables.remove(uuid);
     }
 
-    //When joining the game
+    // When joining the game
     public void setJoinPlayerData(Player player){
         if(plugin.getMySQLConnection() != null){
             MySQLConnection mySQLConnection = plugin.getMySQLConnection();
@@ -85,7 +77,7 @@ public class PlayerVariablesManager {
                         mySQLConnection.updatePlayerName(playerData);
                     }
                 }else {
-                    playerData = new ServerVariablesPlayer(uuid,player.getName(),new ArrayList<>());
+                    playerData = new ServerVariablesPlayer(uuid,player.getName(),new HashMap<>());
                     addPlayer(playerData);
                     //Create if it doesn't exist
                     mySQLConnection.createPlayer(playerData);
@@ -102,186 +94,55 @@ public class PlayerVariablesManager {
                 }
             }else{
                 //Create empty data for player
-                p = new ServerVariablesPlayer(player.getUniqueId(),player.getName(),new ArrayList<>());
+                p = new ServerVariablesPlayer(player.getUniqueId(),player.getName(),new HashMap<>());
                 p.setModified(true);
                 addPlayer(p);
             }
         }
     }
 
-    public VariableResult modifyVariable(String playerName, String variableName, String value, boolean add){
-        FileConfiguration config = plugin.getConfigsManager().getMainConfigManager().getConfig();
-        VariableResult result = getVariableValue(playerName, variableName, true);
-        if(result.isError()){
-            return VariableResult.error(result.getErrorMessage());
-        }
-
-        //Value must be a number
-        if(!MathUtils.isParsable(value)){
-            return VariableResult.error(config.getString("messages.invalidValue"));
-        }
-
-        //ValueType must not be TEXT
-        ValueType valueType = result.getVariable().getValueType();
-        if(valueType == ValueType.TEXT){
-            return add ? VariableResult.error(config.getString("messages.variableAddError")) :
-                    VariableResult.error(config.getString("messages.variableReduceError"));
-        }
-
-        try{
-            double newValue = MathUtils.getDoubleSum(value,result.getResultValue(),add);
-            if(value.contains(".") || valueType == ValueType.DOUBLE){
-                return setVariable(playerName,variableName,newValue+"");
-            }else{
-                return setVariable(playerName,variableName,((long)newValue)+"");
-            }
-        }catch(NumberFormatException e){
-            return add ? VariableResult.error(config.getString("messages.variableAddError")) :
-                    VariableResult.error(config.getString("messages.variableReduceError"));
-        }
-    }
-
-    public VariableResult setVariable(UUID uuid, String variableName, String newValue){
+    public StringVariableResult setVariable(UUID uuid, String variableName, String newValue){
         ServerVariablesPlayer variablesPlayer = getPlayerByUUID(uuid);
-        return setVariable(variablesPlayer,variableName,newValue);
+        return plugin.getVariablesManager().setVariableValue(variablesPlayer.getName(), variableName, newValue);
     }
 
-    public VariableResult setVariable(String playerName, String variableName, String newValue){
-        ServerVariablesPlayer variablesPlayer = getPlayerByName(playerName);
-        return setVariable(variablesPlayer,variableName,newValue);
+    public StringVariableResult setVariable(String playerName, String variableName, String newValue){
+        return plugin.getVariablesManager().setVariableValue(playerName,variableName,newValue);
     }
 
-    private VariableResult setVariable(ServerVariablesPlayer variablesPlayer, String variableName, String newValue){
-        FileConfiguration config = plugin.getConfigsManager().getMainConfigManager().getConfig();
-        VariablesManager variablesManager = plugin.getVariablesManager();
-        Variable variable = variablesManager.getVariable(variableName);
-        VariableResult checkCommon = variablesManager.checkVariableCommon(variableName,newValue);
-        if(checkCommon.isError()){
-            return checkCommon;
-        }
-
-        //Verify if resultValue exists
-        if(checkCommon.getResultValue() != null){
-            newValue = checkCommon.getResultValue();
-        }
-
-        //If newValue is null, setting variable with initial value
-        if(newValue == null){
-            newValue = variable.getInitialValue();
-        }
-
-        //Check if type is truly PLAYER
-        if(variable.getVariableType().equals(VariableType.GLOBAL)){
-            return VariableResult.error(config.getString("messages.variableSetInvalidTypeGlobal"));
-        }
-
-        if(variablesPlayer == null){
-            //The player hasn't joined the server and can't set data.
-            return VariableResult.error(config.getString("messages.playerNoData"));
-        }
-
-        // Transformations
-        newValue = variablesManager.variableTransformations(variable,newValue);
-
-        if(plugin.getMySQLConnection() != null) {
-            plugin.getMySQLConnection().updateVariable(variablesPlayer,variableName,newValue);
-        }
-
-        String oldValue = variablesPlayer.getVariableValue(variableName,variable);
-        variablesPlayer.setVariable(variableName,newValue);
-
-        plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(Bukkit.getPlayer(variablesPlayer.getName()),variable,newValue,oldValue));
-
-        return VariableResult.noErrors(newValue);
-    }
-
-    public VariableResult getVariableValue(UUID uuid, String variableName, boolean modifying){
+    public StringVariableResult getVariableValue(UUID uuid, String variableName, boolean modifying){
         ServerVariablesPlayer variablesPlayer = getPlayerByUUID(uuid);
-        return getVariableValue(variablesPlayer,variableName,modifying);
+        return plugin.getVariablesManager().getVariableValue(variablesPlayer.getName(),variableName,modifying);
     }
 
-    public VariableResult getVariableValue(String playerName, String variableName, boolean modifying){
-        ServerVariablesPlayer variablesPlayer = getPlayerByName(playerName);
-        return getVariableValue(variablesPlayer,variableName,modifying);
+    public StringVariableResult getVariableValue(String playerName, String variableName, boolean modifying){
+        return plugin.getVariablesManager().getVariableValue(playerName,variableName,modifying);
     }
 
-    public VariableResult getVariableValue(ServerVariablesPlayer variablesPlayer, String name, boolean modifying){
-        FileConfiguration config = plugin.getConfigsManager().getMainConfigManager().getConfig();
-
-        Variable variable = plugin.getVariablesManager().getVariable(name);
-
-        if(variable == null){
-            return VariableResult.error(config.getString("messages.variableDoesNotExists"));
-        }
-
-        //Check if type is truly PLAYER
-        if(variable.getVariableType().equals(VariableType.GLOBAL)){
-            if(modifying){
-                return VariableResult.error(config.getString("messages.variableSetInvalidTypeGlobal"));
-            }else{
-                return VariableResult.error(config.getString("messages.variableGetInvalidTypeGlobal"));
-            }
-        }
-
-        if(variablesPlayer == null){
-            //Never joined the server.
-            return VariableResult.error(config.getString("messages.playerNoData"));
-        }
-
-        ServerVariablesVariable currentVariable = variablesPlayer.getVariable(name);
-        if(currentVariable == null){
-            //Get initial value (player has data, but not the variable itself)
-            return VariableResult.noErrorsWithVariable(variable.getInitialValue(),variable);
-        }
-        return VariableResult.noErrorsWithVariable(currentVariable.getCurrentValue(),variable);
+    public StringVariableResult setListVariableAtIndex(UUID uuid, String variableName, int index, String newValue){
+        ServerVariablesPlayer variablesPlayer = getPlayerByUUID(uuid);
+        return plugin.getVariablesManager().getListVariablesManager().setListVariableValue(variablesPlayer.getName(), variableName, index, newValue, false);
     }
 
-    public VariableResult resetVariable(String playerName, String name, boolean all){
-        FileConfiguration config = plugin.getConfigsManager().getMainConfigManager().getConfig();
+    public StringVariableResult setListVariableAtIndex(String playerName, String variableName, int index, String newValue){
+        return plugin.getVariablesManager().getListVariablesManager().setListVariableValue(playerName, variableName, index, newValue, false);
+    }
 
-        ServerVariablesPlayer variablesPlayer = getPlayerByName(playerName);
-        Variable variable = plugin.getVariablesManager().getVariable(name);
+    public StringVariableResult getListVariableValueAtIndex(UUID uuid, String variableName, int index){
+        ServerVariablesPlayer variablesPlayer = getPlayerByUUID(uuid);
+        return plugin.getVariablesManager().getListVariablesManager().getListVariableValueAtIndex(variablesPlayer.getName(),variableName,index);
+    }
 
-        if(variable == null){
-            return VariableResult.error(config.getString("messages.variableDoesNotExists"));
-        }
+    public StringVariableResult getListVariableValueAtIndex(String playerName, String variableName, int index){
+        return plugin.getVariablesManager().getListVariablesManager().getListVariableValueAtIndex(playerName,variableName,index);
+    }
 
-        //Check if type is truly PLAYER
-        if(variable.getVariableType().equals(VariableType.GLOBAL)){
-            return VariableResult.error(config.getString("messages.variableResetInvalidTypeGlobal"));
-        }
+    public ListVariableResult getListVariableValue(UUID uuid, String variableName){
+        ServerVariablesPlayer variablesPlayer = getPlayerByUUID(uuid);
+        return plugin.getVariablesManager().getListVariablesManager().getListVariableValue(variablesPlayer.getName(),variableName,false);
+    }
 
-        if(variablesPlayer == null && !all){
-            //Never joined the server.
-            return VariableResult.noErrorsWithVariable(variable.getInitialValue(),variable);
-        }
-
-        if(plugin.getMySQLConnection() != null) {
-            if(all){
-                plugin.getMySQLConnection().resetVariable(null,name,true);
-            }else{
-                plugin.getMySQLConnection().resetVariable(variablesPlayer,name,false);
-            }
-        }
-
-        if(all){
-            for(Map.Entry<UUID, ServerVariablesPlayer> entry : playerVariables.entrySet()){
-                ServerVariablesPlayer p = entry.getValue();
-                String oldValue = p.getVariableValue(name,variable);
-                if(p.resetVariable(name) && p.getName() != null){
-                    Player player = Bukkit.getPlayer(p.getName());
-                    if(player != null){
-                        plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(player,variable,variable.getInitialValue(),oldValue));
-                    }
-                }
-            }
-        }else{
-            String oldValue = variablesPlayer.getVariableValue(name,variable);
-            if(variablesPlayer.resetVariable(name)){
-                plugin.getServer().getPluginManager().callEvent(new VariableChangeEvent(Bukkit.getPlayer(playerName),variable,variable.getInitialValue(),oldValue));
-            }
-        }
-
-        return VariableResult.noErrors(null);
+    public ListVariableResult getListVariableValue(String playerName, String variableName){
+        return plugin.getVariablesManager().getListVariablesManager().getListVariableValue(playerName,variableName,false);
     }
 }

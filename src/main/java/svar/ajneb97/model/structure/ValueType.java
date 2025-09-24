@@ -3,7 +3,8 @@ package svar.ajneb97.model.structure;
 public enum ValueType {
     TEXT,
     INTEGER,
-    DOUBLE;
+    DOUBLE,
+    LIST;
 
     public static boolean isValid(ValueType type,String currentValue){
         if(type.equals(ValueType.INTEGER)){

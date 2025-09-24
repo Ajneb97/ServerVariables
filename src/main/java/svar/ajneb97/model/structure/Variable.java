@@ -3,21 +3,18 @@ package svar.ajneb97.model.structure;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Variable {
+public abstract class Variable {
 
     private String name;
     private VariableType variableType;
     private ValueType valueType;
-    private String initialValue;
     private List<String> possibleValues;
     private Limitations limitations;
 
-    public Variable(String name,VariableType variableType, ValueType valueType, String initialValue
-    ,List<String> possibleValues,Limitations limitations) {
+    public Variable(String name,VariableType variableType, ValueType valueType, List<String> possibleValues,Limitations limitations) {
         this.name = name;
         this.variableType = variableType;
         this.valueType = valueType;
-        this.initialValue = initialValue;
         this.possibleValues = possibleValues;
         this.limitations = limitations;
     }
@@ -46,14 +43,6 @@ public class Variable {
         this.valueType = valueType;
     }
 
-    public String getInitialValue() {
-        return initialValue;
-    }
-
-    public void setInitialValue(String initialValue) {
-        this.initialValue = initialValue;
-    }
-
     public List<String> getPossibleValues(){
         return possibleValues;
     }
@@ -77,4 +66,6 @@ public class Variable {
     public boolean isNumerical(){
         return valueType.equals(ValueType.INTEGER) || valueType.equals(ValueType.DOUBLE);
     }
+
+    public abstract Object getInitialValue();
 }

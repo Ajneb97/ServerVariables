@@ -6,6 +6,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import svar.ajneb97.api.ServerVariablesAPI;
 import svar.ajneb97.api.ServerVariablesExpansion;
+import svar.ajneb97.commands.MainCommand;
 import svar.ajneb97.config.ConfigsManager;
 import svar.ajneb97.database.MySQLConnection;
 import svar.ajneb97.listeners.PlayerListener;
@@ -14,8 +15,6 @@ import svar.ajneb97.managers.dependencies.Metrics;
 import svar.ajneb97.model.internal.UpdateCheckerResult;
 import svar.ajneb97.tasks.DataSaveTask;
 import svar.ajneb97.utils.ServerVersion;
-
-import java.io.File;
 
 
 public class ServerVariables extends JavaPlugin {

@@ -5,8 +5,13 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.scheduler.BukkitRunnable;
 import svar.ajneb97.ServerVariables;
 import svar.ajneb97.managers.MessagesManager;
+import svar.ajneb97.managers.VariablesManager;
+import svar.ajneb97.model.ServerVariablesListVariable;
 import svar.ajneb97.model.ServerVariablesPlayer;
+import svar.ajneb97.model.ServerVariablesStringVariable;
 import svar.ajneb97.model.ServerVariablesVariable;
+import svar.ajneb97.model.structure.ValueType;
+import svar.ajneb97.model.structure.Variable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -47,6 +52,7 @@ public class MySQLConnection {
 
     public void loadData(){
         Map<UUID, ServerVariablesPlayer> playerMap = new HashMap<>();
+        VariablesManager variablesManager = plugin.getVariablesManager();
         try(Connection connection = getConnection()){
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT servervariables_players.UUID, servervariables_players.PLAYER_NAME, " +
@@ -65,12 +71,21 @@ public class MySQLConnection {
                 ServerVariablesPlayer player = playerMap.get(uuid);
                 if(player == null){
                     //Create and add it
-                    player = new ServerVariablesPlayer(uuid,playerName,new ArrayList<>());
+                    player = new ServerVariablesPlayer(uuid,playerName,new HashMap<>());
                     playerMap.put(uuid, player);
                 }
 
                 if(variableName != null && variableValue != null){
-                    player.addVariable(new ServerVariablesVariable(variableName,variableValue));
+                    Variable variable = variablesManager.getVariable(variableName);
+                    if(variable == null) {
+                        continue;
+                    }
+
+                    if(variable.getValueType().equals(ValueType.LIST)){
+                        player.addVariable(new ServerVariablesListVariable(variableName,new ArrayList<>(Arrays.asList(variableValue.split("\\|")))));
+                    }else{
+                        player.addVariable(new ServerVariablesStringVariable(variableName,variableValue));
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -107,6 +122,7 @@ public class MySQLConnection {
         new BukkitRunnable(){
             @Override
             public void run() {
+                VariablesManager variablesManager = plugin.getVariablesManager();
                 ServerVariablesPlayer player = null;
                 try(Connection connection = getConnection()){
                     PreparedStatement statement = connection.prepareStatement(
@@ -127,10 +143,19 @@ public class MySQLConnection {
                         String variableValue = result.getString("VALUE");
                         if(firstFind){
                             firstFind = false;
-                            player = new ServerVariablesPlayer(UUID.fromString(uuid),playerName,new ArrayList<>());
+                            player = new ServerVariablesPlayer(UUID.fromString(uuid),playerName,new HashMap<>());
                         }
                         if(variableName != null && variableValue != null){
-                            player.addVariable(new ServerVariablesVariable(variableName,variableValue));
+                            Variable variable = variablesManager.getVariable(variableName);
+                            if(variable == null) {
+                                continue;
+                            }
+
+                            if(variable.getValueType().equals(ValueType.LIST)){
+                                player.addVariable(new ServerVariablesListVariable(variableName,new ArrayList<>(Arrays.asList(variableValue.split("\\|")))));
+                            }else{
+                                player.addVariable(new ServerVariablesStringVariable(variableName,variableValue));
+                            }
                         }
                     }
 
@@ -187,7 +212,7 @@ public class MySQLConnection {
     }
 
     public void updateVariable(ServerVariablesPlayer player,String variable,String value){
-        ServerVariablesVariable v = player.getVariable(variable);
+        ServerVariablesVariable v = player.getCurrentVariable(variable);
         new BukkitRunnable(){
             @Override
             public void run() {

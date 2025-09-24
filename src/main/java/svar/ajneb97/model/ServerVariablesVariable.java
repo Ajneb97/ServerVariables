@@ -1,12 +1,10 @@
 package svar.ajneb97.model;
 
-public class ServerVariablesVariable {
+public abstract class ServerVariablesVariable {
     private String variableName;
-    private String currentValue;
 
-    public ServerVariablesVariable(String variableName, String currentValue) {
+    public ServerVariablesVariable(String variableName) {
         this.variableName = variableName;
-        this.currentValue = currentValue;
     }
 
     public String getVariableName() {
@@ -17,11 +15,5 @@ public class ServerVariablesVariable {
         this.variableName = variableName;
     }
 
-    public String getCurrentValue() {
-        return currentValue;
-    }
-
-    public void setCurrentValue(String currentValue) {
-        this.currentValue = currentValue;
-    }
+    public abstract Object getCurrentValue();
 }

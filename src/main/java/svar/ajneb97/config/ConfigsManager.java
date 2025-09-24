@@ -3,13 +3,12 @@ package svar.ajneb97.config;
 import org.bukkit.configuration.file.FileConfiguration;
 import svar.ajneb97.ServerVariables;
 import svar.ajneb97.config.model.CommonConfig;
-import svar.ajneb97.model.structure.Limitations;
-import svar.ajneb97.model.structure.ValueType;
-import svar.ajneb97.model.structure.Variable;
-import svar.ajneb97.model.structure.VariableType;
+import svar.ajneb97.model.structure.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ConfigsManager {
 
@@ -36,7 +35,7 @@ public class ConfigsManager {
 	}
 
 	public void configureVariables(){
-		ArrayList<Variable> variables = new ArrayList<>();
+		Map<String,Variable> variables = new HashMap<>();
 		ArrayList<CommonConfig> variablesConfigs = getVariablesConfigs();
 
 		for(CommonConfig customConfig : variablesConfigs){
@@ -46,7 +45,6 @@ public class ConfigsManager {
 					String path = "variables."+key;
 					VariableType variableType = VariableType.valueOf(config.getString(path+".variable_type"));
 					ValueType valueType = ValueType.valueOf(config.getString(path+".value_type"));
-					String initialValue = config.getString(path+".initial_value");
 
 					List<String> possibleValues = new ArrayList<String>();
 					if(config.contains(path+".possible_values")){
@@ -69,8 +67,13 @@ public class ConfigsManager {
 						limitations.setManageOutOfRange(config.getBoolean(path+".limitations.manage_out_of_range"));
 					}
 
-					Variable variable = new Variable(key, variableType, valueType, initialValue, possibleValues, limitations);
-					variables.add(variable);
+					if(valueType.equals(ValueType.LIST)){
+						variables.put(key,new ListVariable(key, variableType, valueType, possibleValues, limitations,
+								config.getStringList(path+".initial_value")));
+					}else{
+						variables.put(key,new StringVariable(key, variableType, valueType, possibleValues, limitations,
+								config.getString(path+".initial_value")));
+					}
 				}
 			}
 		}

@@ -1,4 +1,4 @@
-package svar.ajneb97;
+package svar.ajneb97.commands;
 
 
 
@@ -10,19 +10,27 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import svar.ajneb97.ServerVariables;
+import svar.ajneb97.commands.subcommands.ListCommand;
 import svar.ajneb97.managers.MessagesManager;
-import svar.ajneb97.model.VariableResult;
+import svar.ajneb97.model.StringVariableResult;
+import svar.ajneb97.model.internal.ValueFromArgumentResult;
+import svar.ajneb97.model.structure.ValueType;
 import svar.ajneb97.model.structure.Variable;
+import svar.ajneb97.utils.OtherUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 public class MainCommand implements CommandExecutor, TabCompleter {
 
 	private ServerVariables plugin;
+	private ListCommand listCommand;
 	public MainCommand(ServerVariables plugin){
 		this.plugin = plugin;
+		this.listCommand = new ListCommand(plugin);
 	}
 
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -45,6 +53,8 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 				reduce(sender,args,config,msgManager);
 			}else if(args[0].equalsIgnoreCase("reset")){
 				reset(sender,args,config,msgManager);
+			}else if(args[0].equalsIgnoreCase("list")){
+				list(sender,args,config,msgManager);
 			}else{
 				help(sender,args,config,msgManager);
 			}
@@ -64,6 +74,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar get <variable> (optional)<player> (optional)silent:true &8Gets the value from a variable."));
 		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar add <variable> <value> (optional)<player> (optional)silent:true &8Adds a value to a variable (INTEGER or DOUBLE)."));
 		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar reduce <variable> <value> (optional)<player> (optional)silent:true &8Reduces the value of a variable (INTEGER or DOUBLE)."));
+		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar list <option> &8Manages a LIST type variable."));
 		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar reset <variable> <value> (optional)<player> (optional)silent:true &8Resets the value of a variable."));
 		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar reload &8Reloads the config."));
 		sender.sendMessage(MessagesManager.getColoredMessage(" "));
@@ -81,38 +92,21 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 		}
 
 		String variableName = args[1];
-		String newValue = args[2];
 
-		int valueExtraArgs = 0;
-		if(newValue.startsWith("\"")){
-			String newValueWithSpaces = newValue; // "value with spaces"
-			for(int i=3;i<args.length;i++){
-				String arg = args[i];
-				newValueWithSpaces=newValueWithSpaces+" "+arg;
-				valueExtraArgs++;
-				if(arg.endsWith("\"")){
-					break;
-				}
-			}
-
-			if(!newValueWithSpaces.startsWith("\"") || !newValueWithSpaces.endsWith("\"")){
-				msgManager.sendMessage(sender,config.getString("messages.commandSetError"),true);
-				return;
-			}
-
-			newValue = newValueWithSpaces.replace("\"","");
+		ValueFromArgumentResult valueResult = OtherUtils.getValueFromArgument(args,2);
+		if(valueResult == null){
+			msgManager.sendMessage(sender,config.getString("messages.commandSetError"),true);
+			return;
 		}
-
+		String newValue = valueResult.getFinalValue();
+		int valueExtraArgs = valueResult.getExtraArgs();
 
 		String playerName = null;
 
-		VariableResult result = null;
 		if(args.length >= 4+valueExtraArgs && !args[3+valueExtraArgs].equals("silent:true")){
 			playerName = args[3+valueExtraArgs];
-			result = plugin.getPlayerVariablesManager().setVariable(playerName,variableName,newValue);
-		}else{
-			result = plugin.getServerVariablesManager().setVariable(variableName,newValue);
 		}
+		StringVariableResult result = plugin.getVariablesManager().setVariableValue(playerName,variableName,newValue);
 
 		boolean silent = args[args.length-1].equals("silent:true");
 
@@ -129,14 +123,11 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 
 		String variableName = args[1];
 		String playerName = null;
-		VariableResult result = null;
 
 		if(args.length >= 3){
 			playerName = args[2];
-			result = plugin.getPlayerVariablesManager().getVariableValue(playerName,variableName, false);
-		}else{
-			result = plugin.getServerVariablesManager().getVariableValue(variableName,false);
 		}
+		StringVariableResult result = plugin.getVariablesManager().getVariableValue(playerName,variableName,false);
 
 		if(result.isError()){
 			msgManager.sendMessage(sender,result.getErrorMessage(),true);
@@ -163,13 +154,10 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 		String value = args[2];
 		String playerName = null;
 
-		VariableResult result = null;
 		if(args.length >= 4 && !args[3].equals("silent:true")){
 			playerName = args[3];
-			result = plugin.getPlayerVariablesManager().modifyVariable(playerName,variableName,value,true);
-		}else{
-			result = plugin.getServerVariablesManager().modifyVariable(variableName,value,true);
 		}
+		StringVariableResult result = plugin.getVariablesManager().modifyVariable(playerName,variableName,value,true);
 
 		boolean silent = args[args.length-1].equals("silent:true");
 
@@ -188,13 +176,10 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 		String value = args[2];
 		String playerName = null;
 
-		VariableResult result = null;
 		if(args.length >= 4 && !args[3].equals("silent:true")){
 			playerName = args[3];
-			result = plugin.getPlayerVariablesManager().modifyVariable(playerName,variableName,value,false);
-		}else{
-			result = plugin.getServerVariablesManager().modifyVariable(variableName,value,false);
 		}
+		StringVariableResult result = plugin.getVariablesManager().modifyVariable(playerName,variableName,value,false);
 
 		boolean silent = args[args.length-1].equals("silent:true");
 
@@ -212,12 +197,12 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 		String variableName = args[1];
 		String playerName = null;
 
-		VariableResult result = null;
+		StringVariableResult result;
 		if(args.length >= 3 && !args[2].equals("silent:true")){
 			playerName = args[2];
-			result = plugin.getPlayerVariablesManager().resetVariable(playerName,variableName,playerName.equals("*"));
+			result = plugin.getVariablesManager().resetVariable(playerName,variableName,playerName.equals("*"));
 		}else{
-			result = plugin.getServerVariablesManager().resetVariable(variableName);
+			result = plugin.getVariablesManager().resetVariable(null,variableName,false);
 		}
 
 		boolean silent = args[args.length-1].equals("silent:true");
@@ -241,8 +226,12 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 		}
 	}
 
-	private void sendMessageSet(CommandSender sender,VariableResult result,MessagesManager msgManager,FileConfiguration config,
-							   String variableName,String playerName,boolean silent){
+	public void list(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager) {
+		listCommand.command(sender,args,config,msgManager);
+	}
+
+	private void sendMessageSet(CommandSender sender, StringVariableResult result, MessagesManager msgManager, FileConfiguration config,
+								String variableName, String playerName, boolean silent){
 		boolean silentCommandsHideErrors = plugin.getConfigsManager().getMainConfigManager().isSilentCommandsHideErrors();
 		if(result.isError()){
 			if(silent && silentCommandsHideErrors){
@@ -280,12 +269,12 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 			return null;
 		}
 
-		if(args.length == 1){
+        List<String> completions = new ArrayList<>();
+        if(args.length == 1){
 			//Show all commands
-			List<String> completions = new ArrayList<String>();
-			List<String> commands = new ArrayList<String>();
+            List<String> commands = new ArrayList<>();
 			commands.add("reload");commands.add("set");commands.add("get");commands.add("add");commands.add("reduce");
-			commands.add("reset");commands.add("help");
+			commands.add("reset");commands.add("help");commands.add("list");
 			for(String c : commands) {
 				if(args[0].isEmpty() || c.startsWith(args[0].toLowerCase())) {
 					completions.add(c);
@@ -293,14 +282,17 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 			}
 			return completions;
 		}else{
-			List<String> completions = new ArrayList<String>();
-			ArrayList<Variable> variables = plugin.getVariablesManager().getVariables();
+            Map<String,Variable> variables = plugin.getVariablesManager().getVariables();
+			if(args[0].equalsIgnoreCase("list")){
+				return listCommand.onTabComplete(sender,args,variables);
+			}
 			if((args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("get") || args[0].equalsIgnoreCase("add")
 					|| args[0].equalsIgnoreCase("reduce") || args[0].equalsIgnoreCase("reset"))
 					&& args.length == 2) {
 				String argVariable = args[1];
-				for(Variable variable : variables) {
-					if(argVariable.isEmpty() || variable.getName().toLowerCase().startsWith(argVariable.toLowerCase())) {
+				for(Map.Entry<String, Variable> entry : variables.entrySet()) {
+					Variable variable = entry.getValue();
+					if((argVariable.isEmpty() || variable.getName().toLowerCase().startsWith(argVariable.toLowerCase())) && !variable.getValueType().equals(ValueType.LIST)) {
 						completions.add(variable.getName());
 					}
 				}
@@ -324,7 +316,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 				return completions;
 			}else if(args[0].equalsIgnoreCase("reset") && args.length == 3) {
 				for(Player p : Bukkit.getOnlinePlayers()) {
-					if(args[2].toLowerCase().isEmpty() || p.getName().startsWith(args[2].toLowerCase())){
+					if(args[2].isEmpty() || p.getName().startsWith(args[2].toLowerCase())){
 						completions.add(p.getName());
 					}
 				}

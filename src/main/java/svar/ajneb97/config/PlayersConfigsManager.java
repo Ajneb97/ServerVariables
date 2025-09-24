@@ -1,6 +1,5 @@
 package svar.ajneb97.config;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +8,9 @@ import java.util.UUID;
 import org.bukkit.configuration.file.FileConfiguration;
 import svar.ajneb97.ServerVariables;
 import svar.ajneb97.config.model.CommonConfig;
+import svar.ajneb97.model.ServerVariablesListVariable;
 import svar.ajneb97.model.ServerVariablesPlayer;
+import svar.ajneb97.model.ServerVariablesStringVariable;
 import svar.ajneb97.model.ServerVariablesVariable;
 
 public class PlayersConfigsManager extends DataFolderConfigManager{
@@ -32,10 +33,14 @@ public class PlayersConfigsManager extends DataFolderConfigManager{
 			FileConfiguration playerFile = commonConfig.getConfig();
 			String name = playerFile.getString("name");
 			String uuidString = commonConfig.getPath().replace(".yml", "");
-			ArrayList<ServerVariablesVariable> variables = new ArrayList<>();
+			Map<String,ServerVariablesVariable> variables = new HashMap<>();
 			if (playerFile.contains("variables")) {
 				for (String key : playerFile.getConfigurationSection("variables").getKeys(false)) {
-					variables.add(new ServerVariablesVariable(key, playerFile.getString("variables." + key)));
+					if(playerFile.isList("variables."+key)){
+						variables.put(key,new ServerVariablesListVariable(key, playerFile.getStringList("variables." + key)));
+					}else{
+						variables.put(key,new ServerVariablesStringVariable(key, playerFile.getString("variables." + key)));
+					}
 				}
 			}
 
@@ -54,9 +59,9 @@ public class PlayersConfigsManager extends DataFolderConfigManager{
 
 		playerFile.set("name", playerName);
 		playerFile.set("variables", null);
-		ArrayList<ServerVariablesVariable> variables = player.getVariables();
-		for(ServerVariablesVariable v : variables){
-			playerFile.set("variables."+v.getVariableName(), v.getCurrentValue());
+		Map<String,ServerVariablesVariable> variables = player.getVariables();
+		for(Map.Entry<String, ServerVariablesVariable> entry : variables.entrySet()){
+			playerFile.set("variables."+entry.getKey(), entry.getValue().getCurrentValue()); // String or List<String>
 		}
 
 		playerConfig.saveConfig();
