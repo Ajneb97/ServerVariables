@@ -133,7 +133,7 @@ public class ServerVariablesExpansion extends PlaceholderExpansion {
             int index = var.indexOf(":");
             String playerName = var.substring(0,index);
             String variable = var.substring(index+1);
-            return ServerVariablesAPI.getVariableValue(playerName,variable).getResultValue();
+            return ServerVariablesAPI.getVariableDisplay(playerName,variable);
         }else if(identifier.startsWith("value_")){
             // %servervariables_value_<variable>%
             if(player == null){
