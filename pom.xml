@@ -6,7 +6,7 @@
 
     <groupId>svar.ajneb97</groupId>
     <artifactId>ServerVariables</artifactId>
-    <version>3.2.1</version>
+    <version>3.3.1</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -32,13 +32,13 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21.10-R0.1-SNAPSHOT</version>
+            <version>1.21.11-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.21.10-R0.1-SNAPSHOT</version>
+            <version>1.21.11-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
