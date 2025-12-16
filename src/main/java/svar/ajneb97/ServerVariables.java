@@ -59,8 +59,8 @@ public class ServerVariables extends JavaPlugin {
             mySQLConnection.setupMySql();
         }
 
-        Bukkit.getConsoleSender().sendMessage(MessagesManager.getColoredMessage(prefix+" &eHas been enabled! &fVersion: "+version));
-        Bukkit.getConsoleSender().sendMessage(MessagesManager.getColoredMessage(prefix+" &eThanks for using my plugin!   &f~Ajneb97"));
+        Bukkit.getConsoleSender().sendMessage(MessagesManager.getLegacyColoredMessage(prefix+" &eHas been enabled! &fVersion: "+version));
+        Bukkit.getConsoleSender().sendMessage(MessagesManager.getLegacyColoredMessage(prefix+" &eThanks for using my plugin!   &f~Ajneb97"));
 
         updateCheckerManager = new UpdateCheckerManager(version);
         updateMessage(updateCheckerManager.check());
@@ -69,11 +69,11 @@ public class ServerVariables extends JavaPlugin {
     public void onDisable(){
         this.configsManager.saveServerData();
         this.configsManager.savePlayerData();
-        Bukkit.getConsoleSender().sendMessage(MessagesManager.getColoredMessage(prefix+" &eHas been disabled! &fVersion: "+version));
+        Bukkit.getConsoleSender().sendMessage(MessagesManager.getLegacyColoredMessage(prefix+" &eHas been disabled! &fVersion: "+version));
     }
 
     public void setPrefix(){
-        prefix = MessagesManager.getColoredMessage("&8[&a&lServerVariables&8]");
+        prefix = MessagesManager.getLegacyColoredMessage("&8[&a&lServerVariables&8]");
     }
 
     public void setVersion(){
@@ -104,6 +104,7 @@ public class ServerVariables extends JavaPlugin {
                 serverVersion = ServerVersion.v1_21_R5;
                 break;
             case "1.21.9":
+            case "1.21.10":
                 serverVersion = ServerVersion.v1_21_R6;
                 break;
             default:
@@ -166,11 +167,11 @@ public class ServerVariables extends JavaPlugin {
         if(!result.isError()){
             String latestVersion = result.getLatestVersion();
             if(latestVersion != null){
-                Bukkit.getConsoleSender().sendMessage(MessagesManager.getColoredMessage("&cThere is a new version available. &e(&7"+latestVersion+"&e)"));
-                Bukkit.getConsoleSender().sendMessage(MessagesManager.getColoredMessage("&cYou can download it at: &fhttps://modrinth.com/plugin/servervariables"));
+                Bukkit.getConsoleSender().sendMessage(MessagesManager.getLegacyColoredMessage("&cThere is a new version available. &e(&7"+latestVersion+"&e)"));
+                Bukkit.getConsoleSender().sendMessage(MessagesManager.getLegacyColoredMessage("&cYou can download it at: &fhttps://modrinth.com/plugin/servervariables"));
             }
         }else{
-            Bukkit.getConsoleSender().sendMessage(MessagesManager.getColoredMessage(prefix+" &cError while checking update."));
+            Bukkit.getConsoleSender().sendMessage(MessagesManager.getLegacyColoredMessage(prefix+" &cError while checking update."));
         }
 
     }

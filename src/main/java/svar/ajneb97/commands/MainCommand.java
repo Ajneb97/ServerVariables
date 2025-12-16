@@ -67,18 +67,18 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 	}
 
 	public void help(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager){
-		sender.sendMessage(MessagesManager.getColoredMessage("&7[ [ &8[&aServerVariables&8] &7] ]"));
-		sender.sendMessage(MessagesManager.getColoredMessage(" "));
-		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar help &8Shows this message."));
-		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar set <variable> <value> (optional)<player> (optional)silent:true &8Sets the value of a variable."));
-		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar get <variable> (optional)<player> (optional)silent:true &8Gets the value from a variable."));
-		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar add <variable> <value> (optional)<player> (optional)silent:true &8Adds a value to a variable (INTEGER or DOUBLE)."));
-		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar reduce <variable> <value> (optional)<player> (optional)silent:true &8Reduces the value of a variable (INTEGER or DOUBLE)."));
-		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar list <option> &8Manages a LIST type variable."));
-		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar reset <variable> <value> (optional)<player> (optional)silent:true &8Resets the value of a variable."));
-		sender.sendMessage(MessagesManager.getColoredMessage("&6/svar reload &8Reloads the config."));
-		sender.sendMessage(MessagesManager.getColoredMessage(" "));
-		sender.sendMessage(MessagesManager.getColoredMessage("&7[ [ &8[&aServerVariables&8] &7] ]"));
+		sender.sendMessage(MessagesManager.getLegacyColoredMessage("&7[ [ &8[&aServerVariables&8] &7] ]"));
+		sender.sendMessage(MessagesManager.getLegacyColoredMessage(" "));
+		sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar help &8Shows this message."));
+		sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar set <variable> <value> (optional)<player> (optional)silent:true &8Sets the value of a variable."));
+		sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar get <variable> (optional)<player> (optional)silent:true &8Gets the value from a variable."));
+		sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar add <variable> <value> (optional)<player> (optional)silent:true &8Adds a value to a variable (INTEGER or DOUBLE)."));
+		sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar reduce <variable> <value> (optional)<player> (optional)silent:true &8Reduces the value of a variable (INTEGER or DOUBLE)."));
+		sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar list <option> &8Manages a LIST type variable."));
+		sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar reset <variable> <value> (optional)<player> (optional)silent:true &8Resets the value of a variable."));
+		sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar reload &8Reloads the config."));
+		sender.sendMessage(MessagesManager.getLegacyColoredMessage(" "));
+		sender.sendMessage(MessagesManager.getLegacyColoredMessage("&7[ [ &8[&aServerVariables&8] &7] ]"));
 
 	}
 
@@ -255,7 +255,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 	public void reload(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager){
 		// /servervariables reload
 		if(!plugin.getConfigsManager().reloadConfigs()){
-			sender.sendMessage(ServerVariables.prefix+MessagesManager.getColoredMessage("&cThere was an error reloading the config, check the console."));
+			sender.sendMessage(ServerVariables.prefix+MessagesManager.getLegacyColoredMessage("&cThere was an error reloading the config, check the console."));
 			return;
 		}
 

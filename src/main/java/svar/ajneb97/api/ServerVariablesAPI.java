@@ -160,4 +160,8 @@ public class ServerVariablesAPI {
         }
         return result.getResultValue().contains(value);
     }
+
+    public static ServerVariables getPlugin() {
+        return plugin;
+    }
 }

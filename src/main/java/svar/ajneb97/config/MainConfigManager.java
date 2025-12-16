@@ -19,6 +19,7 @@ public class MainConfigManager {
 	private boolean updateNotify;
 	private boolean isMySQL;
 	private boolean silentCommandsHideErrors;
+	private boolean useMiniMessage;
 
 	public MainConfigManager(ServerVariables plugin) {
 		this.plugin = plugin;
@@ -42,6 +43,7 @@ public class MainConfigManager {
 		updateNotify = config.getBoolean("update_notify");
 		isMySQL = config.getBoolean("config.mysql_database.enabled");
 		silentCommandsHideErrors = config.getBoolean("config.silent_commands_hide_errors");
+		useMiniMessage = config.getBoolean("config.use_minimessage");
 	}
 
 	public boolean reloadConfig(){
@@ -77,6 +79,10 @@ public class MainConfigManager {
 		try{
 			String text = new String(Files.readAllBytes(pathConfig));
 			FileConfiguration config = getConfig();
+			if(!text.contains("use_minimessage:")){
+				config.set("config.use_minimessage",false);
+				saveConfig();
+			}
 			if(!text.contains("commandListError:")){
 				config.set("messages.commandListError", "&cYou need to use: &7/svar list <option>");
 				config.set("messages.commandListGetError", "&cYou need to use: &7/svar list get <variable> <index> (optional)<player>");
@@ -147,5 +153,9 @@ public class MainConfigManager {
 
 	public boolean isSilentCommandsHideErrors() {
 		return silentCommandsHideErrors;
+	}
+
+	public boolean isUseMiniMessage() {
+		return useMiniMessage;
 	}
 }
