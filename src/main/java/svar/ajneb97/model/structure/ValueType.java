@@ -1,22 +1,26 @@
 package svar.ajneb97.model.structure;
 
 public enum ValueType {
+
     TEXT,
+
     INTEGER,
+
     DOUBLE,
+
     LIST;
 
-    public static boolean isValid(ValueType type,String currentValue){
-        if(type.equals(ValueType.INTEGER)){
-            try{
+    public static boolean isValid(ValueType type, String currentValue) {
+        if (type.equals(ValueType.INTEGER)) {
+            try {
                 Long.parseLong(currentValue);
-            }catch(Exception e){
+            } catch (Exception e) {
                 return false;
             }
-        }else if(type.equals(ValueType.DOUBLE)){
-            try{
+        } else if (type.equals(ValueType.DOUBLE)) {
+            try {
                 Double.parseDouble(currentValue);
-            }catch(Exception e){
+            } catch (Exception e) {
                 return false;
             }
         }

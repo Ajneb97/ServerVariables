@@ -1,6 +1,7 @@
 package svar.ajneb97.model;
 
 public abstract class ServerVariablesVariable {
+
     private String variableName;
 
     public ServerVariablesVariable(String variableName) {

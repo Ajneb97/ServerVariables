@@ -1,8 +1,6 @@
 package svar.ajneb97.commands;
 
 
-
-
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -10,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import svar.ajneb97.ServerVariables;
 import svar.ajneb97.commands.subcommands.ListCommand;
 import svar.ajneb97.managers.MessagesManager;
@@ -24,312 +23,320 @@ import java.util.List;
 import java.util.Map;
 
 
+@SuppressWarnings("DataFlowIssue")
 public class MainCommand implements CommandExecutor, TabCompleter {
 
-	private ServerVariables plugin;
-	private ListCommand listCommand;
-	public MainCommand(ServerVariables plugin){
-		this.plugin = plugin;
-		this.listCommand = new ListCommand(plugin);
-	}
+    private final ServerVariables plugin;
+    private final ListCommand listCommand;
 
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if(!sender.hasPermission("servervariables.admin")){
-			return false;
-		}
+    public MainCommand(ServerVariables plugin) {
+        this.plugin = plugin;
+        this.listCommand = new ListCommand(plugin);
+    }
 
-		FileConfiguration config = plugin.getConfigsManager().getMainConfigManager().getConfig();
-		MessagesManager msgManager = plugin.getMessagesManager();
-		if(args.length >= 1){
-			if(args[0].equalsIgnoreCase("set")){
-				set(sender,args,config,msgManager);
-			}else if(args[0].equalsIgnoreCase("reload")){
-				reload(sender,args,config,msgManager);
-			}else if(args[0].equalsIgnoreCase("get")){
-				get(sender,args,config,msgManager);
-			}else if(args[0].equalsIgnoreCase("add")){
-				add(sender,args,config,msgManager);
-			}else if(args[0].equalsIgnoreCase("reduce")){
-				reduce(sender,args,config,msgManager);
-			}else if(args[0].equalsIgnoreCase("reset")){
-				reset(sender,args,config,msgManager);
-			}else if(args[0].equalsIgnoreCase("list")){
-				list(sender,args,config,msgManager);
-			}else{
-				help(sender,args,config,msgManager);
-			}
-		}else{
-			help(sender,args,config,msgManager);
-		}
+    public boolean onCommand(CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+        if (!sender.hasPermission("servervariables.admin")) {
+            return false;
+        }
 
-		return true;
+        FileConfiguration config = plugin.getConfigsManager().getMainConfigManager().getConfig();
+        MessagesManager msgManager = plugin.getMessagesManager();
+        if (args.length >= 1) {
+            if (args[0].equalsIgnoreCase("set")) {
+                set(sender, args, config, msgManager);
+            } else if (args[0].equalsIgnoreCase("reload")) {
+                reload(sender, config, msgManager);
+            } else if (args[0].equalsIgnoreCase("get")) {
+                get(sender, args, config, msgManager);
+            } else if (args[0].equalsIgnoreCase("add")) {
+                add(sender, args, config, msgManager);
+            } else if (args[0].equalsIgnoreCase("reduce")) {
+                reduce(sender, args, config, msgManager);
+            } else if (args[0].equalsIgnoreCase("reset")) {
+                reset(sender, args, config, msgManager);
+            } else if (args[0].equalsIgnoreCase("list")) {
+                list(sender, args, config, msgManager);
+            } else {
+                help(sender);
+            }
+        } else {
+            help(sender);
+        }
 
-	}
+        return true;
 
-	public void help(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager){
-		sender.sendMessage(MessagesManager.getLegacyColoredMessage("&7[ [ &8[&aServerVariables&8] &7] ]"));
-		sender.sendMessage(MessagesManager.getLegacyColoredMessage(" "));
-		sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar help &8Shows this message."));
-		sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar set <variable> <value> (optional)<player> (optional)silent:true &8Sets the value of a variable."));
-		sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar get <variable> (optional)<player> (optional)silent:true &8Gets the value from a variable."));
-		sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar add <variable> <value> (optional)<player> (optional)silent:true &8Adds a value to a variable (INTEGER or DOUBLE)."));
-		sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar reduce <variable> <value> (optional)<player> (optional)silent:true &8Reduces the value of a variable (INTEGER or DOUBLE)."));
-		sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar list <option> &8Manages a LIST type variable."));
-		sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar reset <variable> <value> (optional)<player> (optional)silent:true &8Resets the value of a variable."));
-		sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar reload &8Reloads the config."));
-		sender.sendMessage(MessagesManager.getLegacyColoredMessage(" "));
-		sender.sendMessage(MessagesManager.getLegacyColoredMessage("&7[ [ &8[&aServerVariables&8] &7] ]"));
+    }
 
-	}
+    public void help(CommandSender sender) {
+        sender.sendMessage(MessagesManager.getLegacyColoredMessage("&7[ [ &8[&aServerVariables&8] &7] ]"));
+        sender.sendMessage(MessagesManager.getLegacyColoredMessage(" "));
+        sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar help &8Shows this message."));
+        sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar set <variable> <value> (optional)<player> (optional)silent:true &8Sets the value of a variable."));
+        sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar get <variable> (optional)<player> (optional)silent:true &8Gets the value from a variable."));
+        sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar add <variable> <value> (optional)<player> (optional)silent:true &8Adds a value to a variable (INTEGER or DOUBLE)."));
+        sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar reduce <variable> <value> (optional)<player> (optional)silent:true &8Reduces the value of a variable (INTEGER or DOUBLE)."));
+        sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar list <option> &8Manages a LIST type variable."));
+        sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar reset <variable> <value> (optional)<player> (optional)silent:true &8Resets the value of a variable."));
+        sender.sendMessage(MessagesManager.getLegacyColoredMessage("&6/svar reload &8Reloads the config."));
+        sender.sendMessage(MessagesManager.getLegacyColoredMessage(" "));
+        sender.sendMessage(MessagesManager.getLegacyColoredMessage("&7[ [ &8[&aServerVariables&8] &7] ]"));
 
-	public void set(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager){
-		//servervariables set <variable> <value> (Set global variable)
-		//servervariables set <variable> <value> <player> (Set player variable)
-		//servervariables set <variable> "<value with spaces>" <player>
-		if(args.length <= 2){
-			msgManager.sendMessage(sender,config.getString("messages.commandSetError"),true);
-			return;
-		}
+    }
 
-		String variableName = args[1];
+    public void set(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager) {
+        //servervariables set <variable> <value> (Set global variable)
+        //servervariables set <variable> <value> <player> (Set player variable)
+        //servervariables set <variable> "<value with spaces>" <player>
+        if (args.length <= 2) {
+            msgManager.sendMessage(sender, config.getString("messages.commandSetError"), true);
+            return;
+        }
 
-		ValueFromArgumentResult valueResult = OtherUtils.getValueFromArgument(args,2);
-		if(valueResult == null){
-			msgManager.sendMessage(sender,config.getString("messages.commandSetError"),true);
-			return;
-		}
-		String newValue = valueResult.getFinalValue();
-		int valueExtraArgs = valueResult.getExtraArgs();
+        String variableName = args[1];
 
-		String playerName = null;
+        ValueFromArgumentResult valueResult = OtherUtils.getValueFromArgument(args, 2);
+        if (valueResult == null) {
+            msgManager.sendMessage(sender, config.getString("messages.commandSetError"), true);
+            return;
+        }
+        String newValue = valueResult.getFinalValue();
+        int valueExtraArgs = valueResult.getExtraArgs();
 
-		if(args.length >= 4+valueExtraArgs && !args[3+valueExtraArgs].equals("silent:true")){
-			playerName = args[3+valueExtraArgs];
-		}
-		StringVariableResult result = plugin.getVariablesManager().setVariableValue(playerName,variableName,newValue);
+        String playerName = null;
 
-		boolean silent = args[args.length-1].equals("silent:true");
+        if (args.length >= 4 + valueExtraArgs && !args[3 + valueExtraArgs].equals("silent:true")) {
+            playerName = args[3 + valueExtraArgs];
+        }
+        StringVariableResult result = plugin.getVariablesManager().setVariableValue(playerName, variableName, newValue);
 
-		sendMessageSet(sender,result,msgManager,config,variableName,playerName,silent);
-	}
+        boolean silent = args[args.length - 1].equals("silent:true");
 
-	public void get(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager) {
-		//servervariables get <variable> (Get global variable)
-		//servervariables get <variable> <player> (Get player variable)
-		if (args.length <= 1) {
-			msgManager.sendMessage(sender, config.getString("messages.commandGetError"), true);
-			return;
-		}
+        sendMessageSet(sender, result, msgManager, config, variableName, playerName, silent);
+    }
 
-		String variableName = args[1];
-		String playerName = null;
+    public void get(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager) {
+        //servervariables get <variable> (Get global variable)
+        //servervariables get <variable> <player> (Get player variable)
+        if (args.length <= 1) {
+            msgManager.sendMessage(sender, config.getString("messages.commandGetError"), true);
+            return;
+        }
 
-		if(args.length >= 3){
-			playerName = args[2];
-		}
-		StringVariableResult result = plugin.getVariablesManager().getVariableValue(playerName,variableName,false);
+        String variableName = args[1];
+        String playerName = null;
 
-		if(result.isError()){
-			msgManager.sendMessage(sender,result.getErrorMessage(),true);
-		}else{
-			if(playerName != null){
-				msgManager.sendMessage(sender,config.getString("messages.commandGetCorrectPlayer").replace("%variable%",variableName)
-						.replace("%value%",result.getResultValue()).replace("%player%",playerName),true);
-			}else{
-				msgManager.sendMessage(sender,config.getString("messages.commandGetCorrect").replace("%variable%",variableName)
-						.replace("%value%",result.getResultValue()),true);
-			}
-		}
-	}
+        if (args.length >= 3) {
+            playerName = args[2];
+        }
+        StringVariableResult result = plugin.getVariablesManager().getVariableValue(playerName, variableName, false);
 
-	public void add(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager){
-		//servervariables add <variable> <value> (Add value to server variable if INTEGER or DOUBLE)
-		//servervariables add <variable> <value> <player> (Add value to player variable if INTEGER or DOUBLE)
-		if(args.length <= 2){
-			msgManager.sendMessage(sender,config.getString("messages.commandAddError"),true);
-			return;
-		}
+        if (result.isError()) {
+            msgManager.sendMessage(sender, result.getErrorMessage(), true);
+        } else {
+            if (playerName != null) {
+                msgManager.sendMessage(sender, config.getString("messages.commandGetCorrectPlayer").replace("%variable%", variableName)
+                        .replace("%value%", result.getResultValue()).replace("%player%", playerName), true);
+            } else {
+                msgManager.sendMessage(sender, config.getString("messages.commandGetCorrect").replace("%variable%", variableName)
+                        .replace("%value%", result.getResultValue()), true);
+            }
+        }
+    }
 
-		String variableName = args[1];
-		String value = args[2];
-		String playerName = null;
+    public void add(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager) {
+        //servervariables add <variable> <value> (Add value to server variable if INTEGER or DOUBLE)
+        //servervariables add <variable> <value> <player> (Add value to player variable if INTEGER or DOUBLE)
+        if (args.length <= 2) {
+            msgManager.sendMessage(sender, config.getString("messages.commandAddError"), true);
+            return;
+        }
 
-		if(args.length >= 4 && !args[3].equals("silent:true")){
-			playerName = args[3];
-		}
-		StringVariableResult result = plugin.getVariablesManager().modifyVariable(playerName,variableName,value,true);
+        String variableName = args[1];
+        String value = args[2];
+        String playerName = null;
 
-		boolean silent = args[args.length-1].equals("silent:true");
+        if (args.length >= 4 && !args[3].equals("silent:true")) {
+            playerName = args[3];
+        }
+        StringVariableResult result = plugin.getVariablesManager().modifyVariable(playerName, variableName, value, true);
 
-		sendMessageSet(sender,result,msgManager,config,variableName,playerName,silent);
-	}
+        boolean silent = args[args.length - 1].equals("silent:true");
 
-	public void reduce(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager){
-		//servervariables reduce <variable> <value> (Reduce value of server variable if INTEGER or DOUBLE)
-		//servervariables reduce <variable> <value> <player> (Reduce value of player variable if INTEGER or DOUBLE)
-		if(args.length <= 2){
-			msgManager.sendMessage(sender,config.getString("messages.commandReduceError"),true);
-			return;
-		}
+        sendMessageSet(sender, result, msgManager, config, variableName, playerName, silent);
+    }
 
-		String variableName = args[1];
-		String value = args[2];
-		String playerName = null;
+    public void reduce(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager) {
+        //servervariables reduce <variable> <value> (Reduce value of server variable if INTEGER or DOUBLE)
+        //servervariables reduce <variable> <value> <player> (Reduce value of player variable if INTEGER or DOUBLE)
+        if (args.length <= 2) {
+            msgManager.sendMessage(sender, config.getString("messages.commandReduceError"), true);
+            return;
+        }
 
-		if(args.length >= 4 && !args[3].equals("silent:true")){
-			playerName = args[3];
-		}
-		StringVariableResult result = plugin.getVariablesManager().modifyVariable(playerName,variableName,value,false);
+        String variableName = args[1];
+        String value = args[2];
+        String playerName = null;
 
-		boolean silent = args[args.length-1].equals("silent:true");
+        if (args.length >= 4 && !args[3].equals("silent:true")) {
+            playerName = args[3];
+        }
+        StringVariableResult result = plugin.getVariablesManager().modifyVariable(playerName, variableName, value, false);
 
-		sendMessageSet(sender,result,msgManager,config,variableName,playerName,silent);
-	}
+        boolean silent = args[args.length - 1].equals("silent:true");
 
-	public void reset(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager){
-		//servervariables reset <variable> (Resets a global variable to the default value)
-		//servervariables reset <variable> <player> (Resets a player variable to the default value)
-		if(args.length <= 1){
-			msgManager.sendMessage(sender,config.getString("messages.commandResetError"),true);
-			return;
-		}
+        sendMessageSet(sender, result, msgManager, config, variableName, playerName, silent);
+    }
 
-		String variableName = args[1];
-		String playerName = null;
+    public void reset(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager) {
+        //servervariables reset <variable> (Resets a global variable to the default value)
+        //servervariables reset <variable> <player> (Resets a player variable to the default value)
+        if (args.length <= 1) {
+            msgManager.sendMessage(sender, config.getString("messages.commandResetError"), true);
+            return;
+        }
 
-		StringVariableResult result;
-		if(args.length >= 3 && !args[2].equals("silent:true")){
-			playerName = args[2];
-			result = plugin.getVariablesManager().resetVariable(playerName,variableName,playerName.equals("*"));
-		}else{
-			result = plugin.getVariablesManager().resetVariable(null,variableName,false);
-		}
+        String variableName = args[1];
+        String playerName = null;
 
-		boolean silent = args[args.length-1].equals("silent:true");
+        StringVariableResult result;
+        if (args.length >= 3 && !args[2].equals("silent:true")) {
+            playerName = args[2];
+            result = plugin.getVariablesManager().resetVariable(playerName, variableName, playerName.equals("*"));
+        } else {
+            result = plugin.getVariablesManager().resetVariable(null, variableName, false);
+        }
 
-		if(result.isError()){
-			msgManager.sendMessage(sender,result.getErrorMessage(),true);
-		}else{
-			if(silent){
-				return;
-			}
-			if(playerName != null){
-				if(playerName.equals("*")){
-					msgManager.sendMessage(sender,config.getString("messages.commandResetCorrectAll").replace("%variable%",variableName),true);
-				}else{
-					msgManager.sendMessage(sender,config.getString("messages.commandResetCorrectPlayer").replace("%variable%",variableName)
-							.replace("%player%",playerName),true);
-				}
-			}else{
-				msgManager.sendMessage(sender,config.getString("messages.commandResetCorrect").replace("%variable%",variableName),true);
-			}
-		}
-	}
+        boolean silent = args[args.length - 1].equals("silent:true");
 
-	public void list(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager) {
-		listCommand.command(sender,args,config,msgManager);
-	}
+        if (result.isError()) {
+            msgManager.sendMessage(sender, result.getErrorMessage(), true);
+        } else {
+            if (silent) {
+                return;
+            }
+            if (playerName != null) {
+                if (playerName.equals("*")) {
+                    msgManager.sendMessage(sender, config.getString("messages.commandResetCorrectAll").replace("%variable%", variableName), true);
+                } else {
+                    msgManager.sendMessage(sender, config.getString("messages.commandResetCorrectPlayer").replace("%variable%", variableName)
+                            .replace("%player%", playerName), true);
+                }
+            } else {
+                msgManager.sendMessage(sender, config.getString("messages.commandResetCorrect").replace("%variable%", variableName), true);
+            }
+        }
+    }
 
-	private void sendMessageSet(CommandSender sender, StringVariableResult result, MessagesManager msgManager, FileConfiguration config,
-								String variableName, String playerName, boolean silent){
-		boolean silentCommandsHideErrors = plugin.getConfigsManager().getMainConfigManager().isSilentCommandsHideErrors();
-		if(result.isError()){
-			if(silent && silentCommandsHideErrors){
-				return;
-			}
-			msgManager.sendMessage(sender,result.getErrorMessage(),true);
-		}else{
-			if(silent){
-				return;
-			}
-			if(playerName != null){
-				msgManager.sendMessage(sender,config.getString("messages.commandSetCorrectPlayer").replace("%variable%",variableName)
-						.replace("%value%",result.getResultValue()).replace("%player%",playerName),true);
-			}else{
-				msgManager.sendMessage(sender,config.getString("messages.commandSetCorrect").replace("%variable%",variableName)
-						.replace("%value%",result.getResultValue()),true);
-			}
-		}
-	}
+    public void list(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager) {
+        listCommand.command(sender, args, config, msgManager);
+    }
 
-	public void reload(CommandSender sender, String[] args, FileConfiguration config, MessagesManager msgManager){
-		// /servervariables reload
-		if(!plugin.getConfigsManager().reloadConfigs()){
-			sender.sendMessage(ServerVariables.prefix+MessagesManager.getLegacyColoredMessage("&cThere was an error reloading the config, check the console."));
-			return;
-		}
+    private void sendMessageSet(CommandSender sender, StringVariableResult result, MessagesManager msgManager, FileConfiguration config,
+                                String variableName, String playerName, boolean silent) {
+        boolean silentCommandsHideErrors = plugin.getConfigsManager().getMainConfigManager().isSilentCommandsHideErrors();
+        if (result.isError()) {
+            if (silent && silentCommandsHideErrors) {
+                return;
+            }
+            msgManager.sendMessage(sender, result.getErrorMessage(), true);
+        } else {
+            if (silent) {
+                return;
+            }
+            if (playerName != null) {
+                msgManager.sendMessage(sender, config.getString("messages.commandSetCorrectPlayer").replace("%variable%", variableName)
+                        .replace("%value%", result.getResultValue()).replace("%player%", playerName), true);
+            } else {
+                msgManager.sendMessage(sender, config.getString("messages.commandSetCorrect").replace("%variable%", variableName)
+                        .replace("%value%", result.getResultValue()), true);
+            }
+        }
+    }
 
-		msgManager.sendMessage(sender,config.getString("messages.pluginReloaded"),true);
-	}
+    public void reload(CommandSender sender, FileConfiguration config, MessagesManager msgManager) {
+        // /servervariables reload
+        if (!plugin.getConfigsManager().reloadConfigs()) {
+            sender.sendMessage(ServerVariables.prefix + MessagesManager.getLegacyColoredMessage("&cThere was an error reloading the config, check the console."));
+            return;
+        }
+
+        msgManager.sendMessage(sender, config.getString("messages.pluginReloaded"), true);
+    }
 
 
-	@Override
-	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
-		if(!sender.hasPermission("servervariables.admin")){
-			return null;
-		}
+    @Override
+    public List<String> onTabComplete(CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+        if (!sender.hasPermission("servervariables.admin")) {
+            return null;
+        }
 
         List<String> completions = new ArrayList<>();
-        if(args.length == 1){
-			//Show all commands
+        if (args.length == 1) {
+            //Show all commands
             List<String> commands = new ArrayList<>();
-			commands.add("reload");commands.add("set");commands.add("get");commands.add("add");commands.add("reduce");
-			commands.add("reset");commands.add("help");commands.add("list");
-			for(String c : commands) {
-				if(args[0].isEmpty() || c.startsWith(args[0].toLowerCase())) {
-					completions.add(c);
-				}
-			}
-			return completions;
-		}else{
-            Map<String,Variable> variables = plugin.getVariablesManager().getVariables();
-			if(args[0].equalsIgnoreCase("list")){
-				return listCommand.onTabComplete(sender,args,variables);
-			}
-			if((args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("get") || args[0].equalsIgnoreCase("add")
-					|| args[0].equalsIgnoreCase("reduce") || args[0].equalsIgnoreCase("reset"))
-					&& args.length == 2) {
-				String argVariable = args[1];
-				for(Map.Entry<String, Variable> entry : variables.entrySet()) {
-					Variable variable = entry.getValue();
-					if((argVariable.isEmpty() || variable.getName().toLowerCase().startsWith(argVariable.toLowerCase())) && !variable.getValueType().equals(ValueType.LIST)) {
-						completions.add(variable.getName());
-					}
-				}
-				return completions;
-			}else if(args[0].equalsIgnoreCase("set") && args.length == 3){
-				Variable variable = plugin.getVariablesManager().getVariable(args[1]);
-				String argVariable = args[2];
+            commands.add("reload");
+            commands.add("set");
+            commands.add("get");
+            commands.add("add");
+            commands.add("reduce");
+            commands.add("reset");
+            commands.add("help");
+            commands.add("list");
+            for (String c : commands) {
+                if (args[0].isEmpty() || c.startsWith(args[0].toLowerCase())) {
+                    completions.add(c);
+                }
+            }
+            return completions;
+        } else {
+            Map<String, Variable> variables = plugin.getVariablesManager().getVariables();
+            if (args[0].equalsIgnoreCase("list")) {
+                return listCommand.onTabComplete(args, variables);
+            }
+            if ((args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("get") || args[0].equalsIgnoreCase("add")
+                    || args[0].equalsIgnoreCase("reduce") || args[0].equalsIgnoreCase("reset"))
+                    && args.length == 2) {
+                String argVariable = args[1];
+                for (Map.Entry<String, Variable> entry : variables.entrySet()) {
+                    Variable variable = entry.getValue();
+                    if ((argVariable.isEmpty() || variable.getName().toLowerCase().startsWith(argVariable.toLowerCase())) && !variable.getValueType().equals(ValueType.LIST)) {
+                        completions.add(variable.getName());
+                    }
+                }
+                return completions;
+            } else if (args[0].equalsIgnoreCase("set") && args.length == 3) {
+                Variable variable = plugin.getVariablesManager().getVariable(args[1]);
+                String argVariable = args[2];
 
-				if(variable != null){
-					List<String> possibleRealValues = variable.getPossibleRealValues();
-					for(String possibleValue : possibleRealValues){
-						if(argVariable.isEmpty() || possibleValue.toLowerCase().startsWith(argVariable.toLowerCase())) {
-							completions.add(possibleValue);
-						}
-					}
-				}
-				completions.add("<value>");
-				return completions;
-			}else if((args[0].equalsIgnoreCase("add") || args[0].equalsIgnoreCase("reduce")) && args.length == 3){
-				completions.add("<value>");
-				return completions;
-			}else if(args[0].equalsIgnoreCase("reset") && args.length == 3) {
-				for(Player p : Bukkit.getOnlinePlayers()) {
-					if(args[2].isEmpty() || p.getName().startsWith(args[2].toLowerCase())){
-						completions.add(p.getName());
-					}
-				}
-				addAllWord(completions,args[2]);
-				return completions;
-			}
-		}
-		return null;
-	}
+                if (variable != null) {
+                    List<String> possibleRealValues = variable.getPossibleRealValues();
+                    for (String possibleValue : possibleRealValues) {
+                        if (argVariable.isEmpty() || possibleValue.toLowerCase().startsWith(argVariable.toLowerCase())) {
+                            completions.add(possibleValue);
+                        }
+                    }
+                }
+                completions.add("<value>");
+                return completions;
+            } else if ((args[0].equalsIgnoreCase("add") || args[0].equalsIgnoreCase("reduce")) && args.length == 3) {
+                completions.add("<value>");
+                return completions;
+            } else if (args[0].equalsIgnoreCase("reset") && args.length == 3) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (args[2].isEmpty() || p.getName().startsWith(args[2].toLowerCase())) {
+                        completions.add(p.getName());
+                    }
+                }
+                addAllWord(completions, args[2]);
+                return completions;
+            }
+        }
+        return null;
+    }
 
-	private void addAllWord(List<String> completions,String arg){
-		if(arg.isEmpty() || "*".startsWith(arg.toLowerCase())) {
-			completions.add("*");
-		}
-	}
+    private void addAllWord(List<String> completions, String arg) {
+        if (arg.isEmpty() || "*".startsWith(arg.toLowerCase())) {
+            completions.add("*");
+        }
+    }
 }

@@ -3,6 +3,7 @@ version: ${project.version}
 name: ServerVariables
 api-version: 1.13
 softdepend: [PlaceholderAPI]
+folia-supported: true
 
 commands:
   servervariables:
