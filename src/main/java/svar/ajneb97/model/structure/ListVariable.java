@@ -2,9 +2,10 @@ package svar.ajneb97.model.structure;
 
 import java.util.List;
 
-public class ListVariable extends Variable{
+public class ListVariable extends Variable {
 
     private List<String> initialValue;
+
     public ListVariable(String name, VariableType variableType, ValueType valueType, List<String> possibleValues, Limitations limitations,
                         List<String> initialValue) {
         super(name, variableType, valueType, possibleValues, limitations);

@@ -4,8 +4,9 @@ import org.bukkit.entity.Player;
 import svar.ajneb97.model.structure.Variable;
 
 public class StringVariableChangeEvent extends VariableChangeEvent {
-    private String newValue;
-    private String oldValue;
+
+    private final String newValue;
+    private final String oldValue;
 
     public StringVariableChangeEvent(Player player, Variable variable, String newValue, String oldValue) {
         super(player, variable);

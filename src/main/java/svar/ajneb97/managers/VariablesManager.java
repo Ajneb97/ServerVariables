@@ -17,10 +17,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@SuppressWarnings("DataFlowIssue")
 public class VariablesManager {
-    private ServerVariables plugin;
-    private ListVariablesManager listVariablesManager;
-    private Map<String,Variable> variables;
+
+    private final ServerVariables plugin;
+    private final ListVariablesManager listVariablesManager;
+    private Map<String, Variable> variables;
 
     public VariablesManager(ServerVariables plugin) {
         this.plugin = plugin;
@@ -35,7 +37,7 @@ public class VariablesManager {
         this.variables = variables;
     }
 
-    public Variable getVariable(String name){
+    public Variable getVariable(String name) {
         return variables.get(name);
     }
 
@@ -43,44 +45,44 @@ public class VariablesManager {
         return listVariablesManager;
     }
 
-    public StringVariableResult getVariableValue(String playerName, @NotNull String variableName, boolean modifying){
+    public StringVariableResult getVariableValue(String playerName, @NotNull String variableName, boolean modifying) {
         FileConfiguration config = plugin.getConfigsManager().getMainConfigManager().getConfig();
 
         Variable aVariable = plugin.getVariablesManager().getVariable(variableName);
-        if(aVariable == null){
-            return StringVariableResult.error(config.getString("messages.variableDoesNotExists"),"variableDoesNotExists");
+        if (aVariable == null) {
+            return StringVariableResult.error(config.getString("messages.variableDoesNotExists"), "variableDoesNotExists");
         }
 
         // Check if variable is LIST
-        if(aVariable.getValueType().equals(ValueType.LIST)){
-            return StringVariableResult.error(config.getString("messages.variableIsList"),"variableIsList");
+        if (aVariable.getValueType().equals(ValueType.LIST)) {
+            return StringVariableResult.error(config.getString("messages.variableIsList"), "variableIsList");
         }
 
         ServerVariablesStringVariable currentVariable;
-        if(playerName != null){
-            // The variable should be PLAYER type.
-            if(aVariable.getVariableType().equals(VariableType.GLOBAL)){
-                if(modifying){
-                    return StringVariableResult.error(config.getString("messages.variableSetInvalidTypeGlobal"),"variableSetInvalidTypeGlobal");
-                }else{
-                    return StringVariableResult.error(config.getString("messages.variableGetInvalidTypeGlobal"),"variableGetInvalidTypeGlobal");
+        if (playerName != null) {
+            // The variable should be a PLAYER type.
+            if (aVariable.getVariableType().equals(VariableType.GLOBAL)) {
+                if (modifying) {
+                    return StringVariableResult.error(config.getString("messages.variableSetInvalidTypeGlobal"), "variableSetInvalidTypeGlobal");
+                } else {
+                    return StringVariableResult.error(config.getString("messages.variableGetInvalidTypeGlobal"), "variableGetInvalidTypeGlobal");
                 }
             }
 
-            // Check if player has joined the server.
+            // Check if the player has joined the server.
             ServerVariablesPlayer serverVariablesPlayer = plugin.getPlayerVariablesManager().getPlayerByName(playerName);
-            if(serverVariablesPlayer == null){
-                return StringVariableResult.error(config.getString("messages.playerNoData"),"playerNoData");
+            if (serverVariablesPlayer == null) {
+                return StringVariableResult.error(config.getString("messages.playerNoData"), "playerNoData");
             }
 
             currentVariable = (ServerVariablesStringVariable) serverVariablesPlayer.getCurrentVariable(variableName);
-        }else{
-            // The variable should be GLOBAL type.
-            if(aVariable.getVariableType().equals(VariableType.PLAYER)){
-                if(modifying){
-                    return StringVariableResult.error(config.getString("messages.variableSetInvalidTypePlayer"),"variableSetInvalidTypePlayer");
-                }else{
-                    return StringVariableResult.error(config.getString("messages.variableGetInvalidTypePlayer"),"variableGetInvalidTypePlayer");
+        } else {
+            // The variable should be a GLOBAL type.
+            if (aVariable.getVariableType().equals(VariableType.PLAYER)) {
+                if (modifying) {
+                    return StringVariableResult.error(config.getString("messages.variableSetInvalidTypePlayer"), "variableSetInvalidTypePlayer");
+                } else {
+                    return StringVariableResult.error(config.getString("messages.variableGetInvalidTypePlayer"), "variableGetInvalidTypePlayer");
                 }
             }
 
@@ -88,230 +90,230 @@ public class VariablesManager {
         }
 
         StringVariable variable = (StringVariable) aVariable;
-        if(currentVariable == null){
+        if (currentVariable == null) {
             // Get initial value
-            return StringVariableResult.noErrorsWithVariable(variable.getInitialValue(),variable);
+            return StringVariableResult.noErrorsWithVariable(variable.getInitialValue(), variable);
         }
-        return StringVariableResult.noErrorsWithVariable(currentVariable.getCurrentValue(),variable);
+        return StringVariableResult.noErrorsWithVariable(currentVariable.getCurrentValue(), variable);
     }
 
-    public StringVariableResult setVariableValue(String playerName, @NotNull String variableName, @NotNull String newValue){
+    public StringVariableResult setVariableValue(String playerName, @NotNull String variableName, @NotNull String newValue) {
         FileConfiguration config = plugin.getConfigsManager().getMainConfigManager().getConfig();
         VariablesManager variablesManager = plugin.getVariablesManager();
 
-        StringVariableResult checkCommon = variablesManager.checkVariableCommon(variableName,newValue);
-        if(checkCommon.isError()){
+        StringVariableResult checkCommon = variablesManager.checkVariableCommon(variableName, newValue);
+        if (checkCommon.isError()) {
             return checkCommon;
         }
 
         // Verify if resultValue exists
-        if(checkCommon.getResultValue() != null){
+        if (checkCommon.getResultValue() != null) {
             newValue = checkCommon.getResultValue();
         }
 
         // Check if variable is LIST
         Variable aVariable = checkCommon.getVariable();
-        if(aVariable.getValueType().equals(ValueType.LIST)){
-            return StringVariableResult.error(config.getString("messages.variableIsList"),"variableIsList");
+        if (aVariable.getValueType().equals(ValueType.LIST)) {
+            return StringVariableResult.error(config.getString("messages.variableIsList"), "variableIsList");
         }
 
         ServerVariablesManager serverVariablesManager = plugin.getServerVariablesManager();
         StringVariable variable = (StringVariable) aVariable;
         ServerVariablesStringVariable currentVariable;
         ServerVariablesPlayer serverVariablesPlayer = null;
-        if(playerName != null){
-            // The variable should be PLAYER type.
-            if(variable.getVariableType().equals(VariableType.GLOBAL)){
-                return StringVariableResult.error(config.getString("messages.variableSetInvalidTypeGlobal"),"variableSetInvalidTypeGlobal");
+        if (playerName != null) {
+            // The variable should be a PLAYER type.
+            if (variable.getVariableType().equals(VariableType.GLOBAL)) {
+                return StringVariableResult.error(config.getString("messages.variableSetInvalidTypeGlobal"), "variableSetInvalidTypeGlobal");
             }
 
-            // Check if player has joined the server.
+            // Check if the player has joined the server.
             serverVariablesPlayer = plugin.getPlayerVariablesManager().getPlayerByName(playerName);
-            if(serverVariablesPlayer == null){
-                return StringVariableResult.error(config.getString("messages.playerNoData"),"playerNoData");
+            if (serverVariablesPlayer == null) {
+                return StringVariableResult.error(config.getString("messages.playerNoData"), "playerNoData");
             }
 
             currentVariable = (ServerVariablesStringVariable) serverVariablesPlayer.getCurrentVariable(variableName);
-        }else{
-            // The variable should be GLOBAL type.
-            if(variable.getVariableType().equals(VariableType.PLAYER)){
-                return StringVariableResult.error(config.getString("messages.variableSetInvalidTypePlayer"),"variableSetInvalidTypePlayer");
+        } else {
+            // The variable should be a GLOBAL type.
+            if (variable.getVariableType().equals(VariableType.PLAYER)) {
+                return StringVariableResult.error(config.getString("messages.variableSetInvalidTypePlayer"), "variableSetInvalidTypePlayer");
             }
 
             currentVariable = (ServerVariablesStringVariable) serverVariablesManager.getCurrentVariable(variableName);
         }
 
         // Transformations
-        newValue = variablesManager.variableTransformations(variable,newValue);
+        newValue = variablesManager.variableTransformations(variable, newValue);
 
         String oldValue;
-        if(currentVariable == null){
+        if (currentVariable == null) {
             // The variable is not set. Get initial value.
             oldValue = variable.getInitialValue();
-        }else{
+        } else {
             oldValue = currentVariable.getCurrentValue();
         }
 
         // Update data
         Player player = null;
-        if(playerName != null){
-            if(plugin.getMySQLConnection() != null) {
-                plugin.getMySQLConnection().updateVariable(serverVariablesPlayer,variableName,newValue);
+        if (playerName != null) {
+            if (plugin.getMySQLConnection() != null) {
+                plugin.getMySQLConnection().updateVariable(serverVariablesPlayer, variableName, newValue);
             }
 
-            if(currentVariable == null){
-                serverVariablesPlayer.addVariable(new ServerVariablesStringVariable(variableName,newValue));
-            }else{
+            if (currentVariable == null) {
+                serverVariablesPlayer.addVariable(new ServerVariablesStringVariable(variableName, newValue));
+            } else {
                 currentVariable.setCurrentValue(newValue);
             }
             serverVariablesPlayer.setModified(true);
 
             player = Bukkit.getPlayer(serverVariablesPlayer.getName());
-        }else{
-            if(currentVariable == null){
-                serverVariablesManager.addVariable(new ServerVariablesStringVariable(variableName,newValue));
-            }else{
+        } else {
+            if (currentVariable == null) {
+                serverVariablesManager.addVariable(new ServerVariablesStringVariable(variableName, newValue));
+            } else {
                 currentVariable.setCurrentValue(newValue);
             }
         }
 
         plugin.getServer().getPluginManager().callEvent(
-                new StringVariableChangeEvent(player,variable,newValue,oldValue));
+                new StringVariableChangeEvent(player, variable, newValue, oldValue));
 
         return StringVariableResult.noErrors(newValue);
     }
 
-    public StringVariableResult modifyVariable(String playerName, String variableName, String value, boolean add){
+    public StringVariableResult modifyVariable(String playerName, String variableName, String value, boolean add) {
         FileConfiguration config = plugin.getConfigsManager().getMainConfigManager().getConfig();
 
         // Get current value
         StringVariableResult result;
-        if(playerName != null){
+        if (playerName != null) {
             // Player
             result = getVariableValue(playerName, variableName, true);
-        }else{
+        } else {
             // Global
-            result = getVariableValue(null, variableName,true);
+            result = getVariableValue(null, variableName, true);
         }
 
-        if(result.isError()){
-            return StringVariableResult.error(result.getErrorMessage(),result.getErrorKey());
+        if (result.isError()) {
+            return StringVariableResult.error(result.getErrorMessage(), result.getErrorKey());
         }
 
         //Value must be a number
-        if(!MathUtils.isParsable(value)){
-            return StringVariableResult.error(config.getString("messages.invalidValue"),"invalidValue");
+        if (!MathUtils.isParsable(value)) {
+            return StringVariableResult.error(config.getString("messages.invalidValue"), "invalidValue");
         }
 
         //ValueType must not be TEXT
         ValueType valueType = result.getVariable().getValueType();
-        if(valueType == ValueType.TEXT){
-            return add ? StringVariableResult.error(config.getString("messages.variableAddError"),"variableAddError") :
-                    StringVariableResult.error(config.getString("messages.variableReduceError"),"variableReduceError");
+        if (valueType == ValueType.TEXT) {
+            return add ? StringVariableResult.error(config.getString("messages.variableAddError"), "variableAddError") :
+                    StringVariableResult.error(config.getString("messages.variableReduceError"), "variableReduceError");
         }
 
-        try{
-            double newValue = MathUtils.getDoubleSum(value,result.getResultValue(),add);
-            if(value.contains(".") || valueType == ValueType.DOUBLE){
-                return setVariableValue(playerName,variableName,newValue+"");
-            }else{
-                return setVariableValue(playerName,variableName,((long)newValue)+"");
+        try {
+            double newValue = MathUtils.getDoubleSum(value, result.getResultValue(), add);
+            if (value.contains(".") || valueType == ValueType.DOUBLE) {
+                return setVariableValue(playerName, variableName, newValue + "");
+            } else {
+                return setVariableValue(playerName, variableName, ((long) newValue) + "");
             }
-        }catch(NumberFormatException e){
-            return add ? StringVariableResult.error(config.getString("messages.variableAddError"),"variableAddError") :
-                    StringVariableResult.error(config.getString("messages.variableReduceError"),"variableReduceError");
+        } catch (NumberFormatException e) {
+            return add ? StringVariableResult.error(config.getString("messages.variableAddError"), "variableAddError") :
+                    StringVariableResult.error(config.getString("messages.variableReduceError"), "variableReduceError");
         }
     }
 
-    public StringVariableResult resetVariable(String playerName, String variableName, boolean allPlayers){
+    public StringVariableResult resetVariable(String playerName, String variableName, boolean allPlayers) {
         FileConfiguration config = plugin.getConfigsManager().getMainConfigManager().getConfig();
 
         Variable aVariable = plugin.getVariablesManager().getVariable(variableName);
-        if(aVariable == null){
-            return StringVariableResult.error(config.getString("messages.variableDoesNotExists"),"variableDoesNotExists");
+        if (aVariable == null) {
+            return StringVariableResult.error(config.getString("messages.variableDoesNotExists"), "variableDoesNotExists");
         }
 
-        if(playerName != null || allPlayers){
-            // The variable should be PLAYER type.
-            if(aVariable.getVariableType().equals(VariableType.GLOBAL)){
-                return StringVariableResult.error(config.getString("messages.variableResetInvalidTypeGlobal"),"variableResetInvalidTypeGlobal");
+        if (playerName != null || allPlayers) {
+            // The variable should be a PLAYER type.
+            if (aVariable.getVariableType().equals(VariableType.GLOBAL)) {
+                return StringVariableResult.error(config.getString("messages.variableResetInvalidTypeGlobal"), "variableResetInvalidTypeGlobal");
             }
 
-            // Check if player has joined the server.
+            // Check if the player has joined the server.
             ServerVariablesPlayer serverVariablesPlayer = null;
-            if(!allPlayers){
+            if (!allPlayers) {
                 serverVariablesPlayer = plugin.getPlayerVariablesManager().getPlayerByName(playerName);
-                if(serverVariablesPlayer == null){
-                    return StringVariableResult.error(config.getString("messages.playerNoData"),"playerNoData");
+                if (serverVariablesPlayer == null) {
+                    return StringVariableResult.error(config.getString("messages.playerNoData"), "playerNoData");
                 }
             }
 
-            if(plugin.getMySQLConnection() != null) {
-                if(allPlayers){
-                    plugin.getMySQLConnection().resetVariable(null,variableName,true);
-                }else{
-                    plugin.getMySQLConnection().resetVariable(serverVariablesPlayer,variableName,false);
+            if (plugin.getMySQLConnection() != null) {
+                if (allPlayers) {
+                    plugin.getMySQLConnection().resetVariable(null, variableName, true);
+                } else {
+                    plugin.getMySQLConnection().resetVariable(serverVariablesPlayer, variableName, false);
                 }
             }
 
-            if(allPlayers){
-                Map<UUID,ServerVariablesPlayer> playerVariables = plugin.getPlayerVariablesManager().getPlayerVariables();
-                for(Map.Entry<UUID, ServerVariablesPlayer> entry : playerVariables.entrySet()){
+            if (allPlayers) {
+                Map<UUID, ServerVariablesPlayer> playerVariables = plugin.getPlayerVariablesManager().getPlayerVariables();
+                for (Map.Entry<UUID, ServerVariablesPlayer> entry : playerVariables.entrySet()) {
                     ServerVariablesPlayer p = entry.getValue();
                     ServerVariablesVariable removed = p.resetVariable(variableName);
-                    if(removed != null && p.getName() != null){
+                    if (removed != null && p.getName() != null) {
                         Player player = Bukkit.getPlayer(p.getName());
-                        if(player != null){
-                            if(aVariable.getValueType().equals(ValueType.LIST)){
+                        if (player != null) {
+                            if (aVariable.getValueType().equals(ValueType.LIST)) {
                                 ServerVariablesListVariable removedF = (ServerVariablesListVariable) removed;
                                 ListVariable variable = (ListVariable) aVariable;
                                 plugin.getServer().getPluginManager().callEvent(
-                                        new ListVariableChangeEvent(player,variable,variable.getInitialValue(),removedF.getCurrentValue(),-1));
-                            }else{
+                                        new ListVariableChangeEvent(player, variable, variable.getInitialValue(), removedF.getCurrentValue(), -1));
+                            } else {
                                 ServerVariablesStringVariable removedF = (ServerVariablesStringVariable) removed;
                                 StringVariable variable = (StringVariable) aVariable;
                                 plugin.getServer().getPluginManager().callEvent(
-                                        new StringVariableChangeEvent(player,variable,variable.getInitialValue(),removedF.getCurrentValue()));
+                                        new StringVariableChangeEvent(player, variable, variable.getInitialValue(), removedF.getCurrentValue()));
                             }
                         }
                     }
                 }
-            }else{
-                if(aVariable.getValueType().equals(ValueType.LIST)){
+            } else {
+                if (aVariable.getValueType().equals(ValueType.LIST)) {
                     ServerVariablesListVariable removed = (ServerVariablesListVariable) serverVariablesPlayer.resetVariable(variableName);
-                    if(removed != null){
+                    if (removed != null) {
                         ListVariable variable = (ListVariable) aVariable;
                         plugin.getServer().getPluginManager().callEvent(
-                                new ListVariableChangeEvent(Bukkit.getPlayer(playerName),variable,variable.getInitialValue(),removed.getCurrentValue(),-1));
+                                new ListVariableChangeEvent(Bukkit.getPlayer(playerName), variable, variable.getInitialValue(), removed.getCurrentValue(), -1));
                     }
-                }else{
+                } else {
                     ServerVariablesStringVariable removed = (ServerVariablesStringVariable) serverVariablesPlayer.resetVariable(variableName);
-                    if(removed != null){
+                    if (removed != null) {
                         StringVariable variable = (StringVariable) aVariable;
                         plugin.getServer().getPluginManager().callEvent(
-                                new StringVariableChangeEvent(Bukkit.getPlayer(playerName),variable,variable.getInitialValue(),removed.getCurrentValue()));
+                                new StringVariableChangeEvent(Bukkit.getPlayer(playerName), variable, variable.getInitialValue(), removed.getCurrentValue()));
                     }
                 }
             }
-        }else{
-            // The variable should be GLOBAL type.
-            if(aVariable.getVariableType().equals(VariableType.PLAYER)){
-                return StringVariableResult.error(config.getString("messages.variableResetInvalidTypePlayer"),"variableResetInvalidTypePlayer");
+        } else {
+            // The variable should be a GLOBAL type.
+            if (aVariable.getVariableType().equals(VariableType.PLAYER)) {
+                return StringVariableResult.error(config.getString("messages.variableResetInvalidTypePlayer"), "variableResetInvalidTypePlayer");
             }
 
-            if(aVariable.getValueType().equals(ValueType.LIST)){
+            if (aVariable.getValueType().equals(ValueType.LIST)) {
                 ServerVariablesListVariable removed = (ServerVariablesListVariable) plugin.getServerVariablesManager().getVariables().remove(variableName);
-                if(removed != null){
+                if (removed != null) {
                     ListVariable variable = (ListVariable) aVariable;
                     plugin.getServer().getPluginManager().callEvent(
-                            new ListVariableChangeEvent(null,variable,variable.getInitialValue(),removed.getCurrentValue(),-1));
+                            new ListVariableChangeEvent(null, variable, variable.getInitialValue(), removed.getCurrentValue(), -1));
                 }
-            }else{
+            } else {
                 ServerVariablesStringVariable removed = (ServerVariablesStringVariable) plugin.getServerVariablesManager().getVariables().remove(variableName);
-                if(removed != null){
+                if (removed != null) {
                     StringVariable variable = (StringVariable) aVariable;
                     plugin.getServer().getPluginManager().callEvent(
-                            new StringVariableChangeEvent(null,variable,variable.getInitialValue(),removed.getCurrentValue()));
+                            new StringVariableChangeEvent(null, variable, variable.getInitialValue(), removed.getCurrentValue()));
                 }
             }
         }
@@ -319,43 +321,43 @@ public class VariablesManager {
         return StringVariableResult.noErrors(null);
     }
 
-    public StringVariableResult checkVariableCommon(String variableName, String newValue){
+    public StringVariableResult checkVariableCommon(String variableName, String newValue) {
         FileConfiguration config = plugin.getConfigsManager().getMainConfigManager().getConfig();
         Variable variable = plugin.getVariablesManager().getVariable(variableName);
-        if(variable == null){
+        if (variable == null) {
             //Variable doesn't exist
-            return StringVariableResult.error(config.getString("messages.variableDoesNotExists"),"variableDoesNotExists");
+            return StringVariableResult.error(config.getString("messages.variableDoesNotExists"), "variableDoesNotExists");
         }
 
         //Check if newValue is valid
         ValueType type = variable.getValueType();
-        if(!ValueType.isValid(type,newValue)){
+        if (!ValueType.isValid(type, newValue)) {
             return StringVariableResult.error(config.getString("messages.variableInvalidValue")
-                    .replace("%value_type%",type.name()),"variableInvalidValue");
+                    .replace("%value_type%", type.name()), "variableInvalidValue");
         }
 
         //Check for possible values
         List<String> possibleRealValues = variable.getPossibleRealValues();
-        if(!possibleRealValues.isEmpty()){
+        if (!possibleRealValues.isEmpty()) {
             boolean isPossibleValue = false;
-            String possibleValuesText = "";
+            StringBuilder possibleValuesText = new StringBuilder();
 
-            for(int i=0;i<possibleRealValues.size();i++){
+            for (int i = 0; i < possibleRealValues.size(); i++) {
                 String possibleValue = possibleRealValues.get(i);
-                if(possibleValue.equals(newValue)){
+                if (possibleValue.equals(newValue)) {
                     isPossibleValue = true;
                     break;
                 }
-                if(i == possibleRealValues.size()-1){
-                    possibleValuesText = possibleValuesText+possibleValue;
-                }else{
-                    possibleValuesText = possibleValuesText+possibleValue+", ";
+                if (i == possibleRealValues.size() - 1) {
+                    possibleValuesText.append(possibleValue);
+                } else {
+                    possibleValuesText.append(possibleValue).append(", ");
                 }
 
             }
-            if(!isPossibleValue){
+            if (!isPossibleValue) {
                 return StringVariableResult.error(config.getString("messages.variableNotPossibleValue")
-                        .replace("%values%",possibleValuesText),"variableNotPossibleValue");
+                        .replace("%values%", possibleValuesText.toString()), "variableNotPossibleValue");
             }
         }
 
@@ -363,44 +365,44 @@ public class VariablesManager {
 
         //Check limitations
         Limitations limitations = variable.getLimitations();
-        if(variable.isNumerical()){
+        if (variable.isNumerical()) {
             double value = Double.parseDouble(newValue);
             String maxValue;
             String minValue;
-            if(variable.getValueType().equals(ValueType.DOUBLE)){
-                maxValue = limitations.getMaxValue()+"";
-                minValue = limitations.getMinValue()+"";
-            }else{
-                maxValue = (long)limitations.getMaxValue()+"";
-                minValue = (long)limitations.getMinValue()+"";
+            if (variable.getValueType().equals(ValueType.DOUBLE)) {
+                maxValue = limitations.getMaxValue() + "";
+                minValue = limitations.getMinValue() + "";
+            } else {
+                maxValue = (long) limitations.getMaxValue() + "";
+                minValue = (long) limitations.getMinValue() + "";
             }
-            if(value > limitations.getMaxValue()){
-                if(!limitations.isManageOutOfRange()){
+            if (value > limitations.getMaxValue()) {
+                if (!limitations.isManageOutOfRange()) {
                     return StringVariableResult.error(config.getString("messages.variableLimitationOutOfRangeMax")
-                            .replace("%value%",maxValue),"variableLimitationOutOfRangeMax");
+                            .replace("%value%", maxValue), "variableLimitationOutOfRangeMax");
                 }
                 resultValue = maxValue;
             }
-            if(value < limitations.getMinValue()){
-                if(!limitations.isManageOutOfRange()){
+            if (value < limitations.getMinValue()) {
+                if (!limitations.isManageOutOfRange()) {
                     return StringVariableResult.error(config.getString("messages.variableLimitationOutOfRangeMin")
-                            .replace("%value%",minValue),"variableLimitationOutOfRangeMin");
+                            .replace("%value%", minValue), "variableLimitationOutOfRangeMin");
                 }
                 resultValue = minValue;
             }
-        }else{
+        } else {
             int maxCharacters = limitations.getMaxCharacters();
-            if(newValue.length() > maxCharacters){
+            if (newValue.length() > maxCharacters) {
                 return StringVariableResult.error(config.getString("messages.variableLimitationMaxCharactersError")
-                        .replace("%value%",maxCharacters+""),"variableLimitationMaxCharactersError");
+                        .replace("%value%", maxCharacters + ""), "variableLimitationMaxCharactersError");
             }
         }
 
-        return StringVariableResult.noErrorsWithVariable(resultValue,variable);
+        return StringVariableResult.noErrorsWithVariable(resultValue, variable);
     }
 
-    public String variableTransformations(Variable variable, String newValue){
-        if(!variable.getValueType().equals(ValueType.DOUBLE)){
+    public String variableTransformations(Variable variable, String newValue) {
+        if (!variable.getValueType().equals(ValueType.DOUBLE)) {
             return newValue;
         }
         int maxDecimals = variable.getLimitations().getMaxDecimals();
@@ -408,13 +410,13 @@ public class VariablesManager {
         return new BigDecimal(newValue).setScale(maxDecimals, RoundingMode.HALF_UP).toString();
     }
 
-    public String getDisplayFromVariableValue(Variable variable,String value){
+    public String getDisplayFromVariableValue(Variable variable, String value) {
         List<String> possibleValues = variable.getPossibleValues();
 
-        for(String possibleValue : possibleValues){
+        for (String possibleValue : possibleValues) {
             String[] fullValue = possibleValue.split(";");
-            if(fullValue[0].equals(value)){
-                if(fullValue.length > 1){
+            if (fullValue[0].equals(value)) {
+                if (fullValue.length > 1) {
                     return fullValue[1];
                 }
             }

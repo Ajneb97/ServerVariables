@@ -5,13 +5,13 @@ import java.util.List;
 
 public abstract class Variable {
 
-    private String name;
-    private VariableType variableType;
-    private ValueType valueType;
-    private List<String> possibleValues;
-    private Limitations limitations;
+    private final String name;
+    private final VariableType variableType;
+    private final ValueType valueType;
+    private final List<String> possibleValues;
+    private final Limitations limitations;
 
-    public Variable(String name,VariableType variableType, ValueType valueType, List<String> possibleValues,Limitations limitations) {
+    public Variable(String name, VariableType variableType, ValueType valueType, List<String> possibleValues, Limitations limitations) {
         this.name = name;
         this.variableType = variableType;
         this.valueType = valueType;
@@ -23,32 +23,23 @@ public abstract class Variable {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public VariableType getVariableType() {
         return variableType;
     }
 
-    public void setVariableType(VariableType variableType) {
-        this.variableType = variableType;
-    }
 
     public ValueType getValueType() {
         return valueType;
     }
 
-    public void setValueType(ValueType valueType) {
-        this.valueType = valueType;
-    }
 
-    public List<String> getPossibleValues(){
+    public List<String> getPossibleValues() {
         return possibleValues;
     }
-    public List<String> getPossibleRealValues(){
+
+    public List<String> getPossibleRealValues() {
         List<String> list = new ArrayList<>();
-        for(String value : possibleValues){
+        for (String value : possibleValues) {
             String realValue = value.split(";")[0];
             list.add(realValue);
         }
@@ -59,11 +50,7 @@ public abstract class Variable {
         return limitations;
     }
 
-    public void setLimitations(Limitations limitations) {
-        this.limitations = limitations;
-    }
-
-    public boolean isNumerical(){
+    public boolean isNumerical() {
         return valueType.equals(ValueType.INTEGER) || valueType.equals(ValueType.DOUBLE);
     }
 

@@ -1,6 +1,7 @@
 package svar.ajneb97.model.structure;
 
 public class Limitations {
+
     private double minValue;
     private double maxValue;
     private int maxCharacters;
@@ -47,6 +48,7 @@ public class Limitations {
         this.maxDecimals = maxDecimals;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isManageOutOfRange() {
         return manageOutOfRange;
     }

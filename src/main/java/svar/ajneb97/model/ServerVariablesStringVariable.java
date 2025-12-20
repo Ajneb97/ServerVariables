@@ -1,6 +1,6 @@
 package svar.ajneb97.model;
 
-public class ServerVariablesStringVariable extends ServerVariablesVariable{
+public class ServerVariablesStringVariable extends ServerVariablesVariable {
 
     private String currentValue;
 

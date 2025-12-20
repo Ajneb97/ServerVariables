@@ -1,8 +1,9 @@
 package svar.ajneb97.model.internal;
 
 public class ValueFromArgumentResult {
-    private String finalValue;
-    private int extraArgs;
+
+    private final String finalValue;
+    private final int extraArgs;
 
     public ValueFromArgumentResult(String finalValue, int extraArgs) {
         this.finalValue = finalValue;
@@ -13,15 +14,7 @@ public class ValueFromArgumentResult {
         return finalValue;
     }
 
-    public void setFinalValue(String finalValue) {
-        this.finalValue = finalValue;
-    }
-
     public int getExtraArgs() {
         return extraArgs;
-    }
-
-    public void setExtraArgs(int extraArgs) {
-        this.extraArgs = extraArgs;
     }
 }

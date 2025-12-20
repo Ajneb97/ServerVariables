@@ -5,10 +5,12 @@ import svar.ajneb97.model.structure.Variable;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class ListVariableChangeEvent extends VariableChangeEvent {
-    private List<String> newValue;
-    private List<String> oldValue;
-    private int indexModified;
+
+    private final List<String> newValue;
+    private final List<String> oldValue;
+    private final int indexModified;
 
     public ListVariableChangeEvent(Player player, Variable variable, List<String> newValue, List<String> oldValue, int indexModified) {
         super(player, variable);

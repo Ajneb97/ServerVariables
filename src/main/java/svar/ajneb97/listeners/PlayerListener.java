@@ -9,13 +9,15 @@ import svar.ajneb97.managers.MessagesManager;
 
 public class PlayerListener implements Listener {
 
-    private ServerVariables plugin;
+    private final ServerVariables plugin;
+    private final String prefix = ServerVariables.prefix;
+
     public PlayerListener(ServerVariables plugin) {
         this.plugin = plugin;
     }
 
     @EventHandler
-    public void onJoin(PlayerJoinEvent event){
+    public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
         //Create or update player data
@@ -23,8 +25,8 @@ public class PlayerListener implements Listener {
 
         //Update notification
         String latestVersion = plugin.getUpdateCheckerManager().getLatestVersion();
-        if(player.isOp() && plugin.getConfigsManager().getMainConfigManager().isUpdateNotify() && !plugin.version.equals(latestVersion)){
-            player.sendMessage(MessagesManager.getLegacyColoredMessage(plugin.prefix+" &cThere is a new version available. &e(&7"+latestVersion+"&e)"));
+        if (player.isOp() && plugin.getConfigsManager().getMainConfigManager().isUpdateNotify() && !plugin.version.equals(latestVersion)) {
+            player.sendMessage(MessagesManager.getLegacyColoredMessage(prefix + " &cThere is a new version available. &e(&7" + latestVersion + "&e)"));
             player.sendMessage(MessagesManager.getLegacyColoredMessage("&cYou can download it at: &ahttps://modrinth.com/plugin/servervariables"));
         }
     }

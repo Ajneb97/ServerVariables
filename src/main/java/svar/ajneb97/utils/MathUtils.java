@@ -2,9 +2,9 @@ package svar.ajneb97.utils;
 
 public class MathUtils {
 
-    public static double getDoubleSum(String value1,String value2,boolean add){
+    public static double getDoubleSum(String value1, String value2, boolean add) {
         double numericValue = Double.parseDouble(value1);
-        return add ? Double.parseDouble(value2)+numericValue : Double.parseDouble(value2)-numericValue;
+        return add ? Double.parseDouble(value2) + numericValue : Double.parseDouble(value2) - numericValue;
     }
 
     // org.apache.commons.lang3.math.NumberUtils
@@ -14,7 +14,7 @@ public class MathUtils {
         } else if (str.charAt(str.length() - 1) == '.') {
             return false;
         } else if (str.charAt(0) == '-') {
-            return str.length() == 1 ? false : withDecimalsParsing(str, 1);
+            return str.length() != 1 && withDecimalsParsing(str, 1);
         } else {
             return withDecimalsParsing(str, 0);
         }
@@ -24,7 +24,7 @@ public class MathUtils {
     private static boolean withDecimalsParsing(String str, int beginIdx) {
         int decimalPoints = 0;
 
-        for(int i = beginIdx; i < str.length(); ++i) {
+        for (int i = beginIdx; i < str.length(); ++i) {
             boolean isDecimalPoint = str.charAt(i) == '.';
             if (isDecimalPoint) {
                 ++decimalPoints;

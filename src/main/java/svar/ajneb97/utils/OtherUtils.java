@@ -7,42 +7,30 @@ public class OtherUtils {
 
     public static boolean isNew() {
         ServerVersion serverVersion = ServerVariables.serverVersion;
-        if(serverVersion.serverVersionGreaterEqualThan(serverVersion,ServerVersion.v1_16_R1)){
-            return true;
-        }
-        return false;
+        return serverVersion.serverVersionGreaterEqualThan(serverVersion, ServerVersion.v1_16_R1);
     }
 
-    public static String getFileExtension(String filePath) {
-        int lastIndex = filePath.lastIndexOf(".");
-        if (lastIndex > 0 && lastIndex < filePath.length() - 1) {
-            return filePath.substring(lastIndex+1);
-        } else {
-            return "invalid";
-        }
-    }
-
-    public static ValueFromArgumentResult getValueFromArgument(String[] args, int startArg){
+    public static ValueFromArgumentResult getValueFromArgument(String[] args, int startArg) {
         String value = args[startArg];
         int valueExtraArgs = 0;
-        if(value.startsWith("\"")){
-            String newValueWithSpaces = value; // "value with spaces"
-            for(int i=startArg+1;i<args.length;i++){
+        if (value.startsWith("\"")) {
+            StringBuilder newValueWithSpaces = new StringBuilder(value); // "value with spaces"
+            for (int i = startArg + 1; i < args.length; i++) {
                 String arg = args[i];
-                newValueWithSpaces=newValueWithSpaces+" "+arg;
+                newValueWithSpaces.append(" ").append(arg);
                 valueExtraArgs++;
-                if(arg.endsWith("\"")){
+                if (arg.endsWith("\"")) {
                     break;
                 }
             }
 
-            if(!newValueWithSpaces.startsWith("\"") || !newValueWithSpaces.endsWith("\"")){
+            if (!newValueWithSpaces.toString().startsWith("\"") || !newValueWithSpaces.toString().endsWith("\"")) {
                 return null;
             }
 
-            value = newValueWithSpaces.replace("\"","");
+            value = newValueWithSpaces.toString().replace("\"", "");
         }
 
-        return new ValueFromArgumentResult(value,valueExtraArgs);
+        return new ValueFromArgumentResult(value, valueExtraArgs);
     }
 }

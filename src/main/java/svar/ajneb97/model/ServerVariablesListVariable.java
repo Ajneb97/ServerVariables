@@ -2,7 +2,7 @@ package svar.ajneb97.model;
 
 import java.util.List;
 
-public class ServerVariablesListVariable extends ServerVariablesVariable{
+public class ServerVariablesListVariable extends ServerVariablesVariable {
 
     private List<String> currentValue;
 
