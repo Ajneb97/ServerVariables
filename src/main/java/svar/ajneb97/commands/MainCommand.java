@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import svar.ajneb97.ServerVariables;
 import svar.ajneb97.commands.subcommands.ListCommand;
 import svar.ajneb97.managers.MessagesManager;
+import svar.ajneb97.managers.VariablesManager;
 import svar.ajneb97.model.StringVariableResult;
 import svar.ajneb97.model.internal.ValueFromArgumentResult;
 import svar.ajneb97.model.structure.ValueType;
@@ -196,33 +197,39 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 
 		String variableName = args[1];
 		String playerName = null;
-
-		StringVariableResult result;
-		if(args.length >= 3 && !args[2].equals("silent:true")){
-			playerName = args[2];
-			result = plugin.getVariablesManager().resetVariable(playerName,variableName,playerName.equals("*"));
-		}else{
-			result = plugin.getVariablesManager().resetVariable(null,variableName,false);
-		}
-
 		boolean silent = args[args.length-1].equals("silent:true");
 
-		if(result.isError()){
-			msgManager.sendMessage(sender,result.getErrorMessage(),true);
+		VariablesManager variablesManager = plugin.getVariablesManager();
+
+		if(args.length >= 3 && !args[2].equals("silent:true")){
+			playerName = args[2];
+			if(playerName.equals("*")){
+				variablesManager.resetVariableForAllPlayers(variableName, result -> {
+					if(result.isError()){
+						msgManager.sendMessage(sender,result.getErrorMessage(),true);
+						return;
+					}
+					if(silent) return;
+					msgManager.sendMessage(sender,config.getString("messages.commandResetCorrectAll").replace("%variable%",variableName),true);
+				});
+			}else{
+				StringVariableResult result = variablesManager.resetVariableForPlayer(playerName,variableName);
+				if(result.isError()){
+					msgManager.sendMessage(sender,result.getErrorMessage(),true);
+					return;
+				}
+				if(silent) return;
+				msgManager.sendMessage(sender,config.getString("messages.commandResetCorrectPlayer").replace("%variable%",variableName)
+						.replace("%player%",playerName),true);
+			}
 		}else{
-			if(silent){
+			StringVariableResult result = variablesManager.resetGlobalVariable(variableName);
+			if(result.isError()){
+				msgManager.sendMessage(sender,result.getErrorMessage(),true);
 				return;
 			}
-			if(playerName != null){
-				if(playerName.equals("*")){
-					msgManager.sendMessage(sender,config.getString("messages.commandResetCorrectAll").replace("%variable%",variableName),true);
-				}else{
-					msgManager.sendMessage(sender,config.getString("messages.commandResetCorrectPlayer").replace("%variable%",variableName)
-							.replace("%player%",playerName),true);
-				}
-			}else{
-				msgManager.sendMessage(sender,config.getString("messages.commandResetCorrect").replace("%variable%",variableName),true);
-			}
+			if(silent) return;
+			msgManager.sendMessage(sender,config.getString("messages.commandResetCorrect").replace("%variable%",variableName),true);
 		}
 	}
 

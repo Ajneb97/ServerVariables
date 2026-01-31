@@ -1,17 +1,18 @@
 package svar.ajneb97.config;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
+import org.bukkit.GameMode;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import svar.ajneb97.ServerVariables;
 import svar.ajneb97.config.model.CommonConfig;
 import svar.ajneb97.model.ServerVariablesListVariable;
 import svar.ajneb97.model.ServerVariablesPlayer;
 import svar.ajneb97.model.ServerVariablesStringVariable;
 import svar.ajneb97.model.ServerVariablesVariable;
+import svar.ajneb97.model.internal.GenericCallback;
 
 public class PlayersConfigsManager extends DataFolderConfigManager{
 
@@ -26,35 +27,49 @@ public class PlayersConfigsManager extends DataFolderConfigManager{
 
 	@Override
 	public void loadConfigs() {
-		Map<UUID,ServerVariablesPlayer> players = new HashMap<>();
+		// No use for player config
+	}
 
-		ArrayList<CommonConfig> configs = getConfigs();
-		for(CommonConfig commonConfig : configs){
-			FileConfiguration playerFile = commonConfig.getConfig();
-			String name = playerFile.getString("name");
-			String uuidString = commonConfig.getPath().replace(".yml", "");
-			Map<String,ServerVariablesVariable> variables = new HashMap<>();
-			if (playerFile.contains("variables")) {
-				for (String key : playerFile.getConfigurationSection("variables").getKeys(false)) {
-					if(playerFile.isList("variables."+key)){
-						variables.put(key,new ServerVariablesListVariable(key, playerFile.getStringList("variables." + key)));
-					}else{
-						variables.put(key,new ServerVariablesStringVariable(key, playerFile.getString("variables." + key)));
+	public void loadConfig(UUID uuid, GenericCallback<ServerVariablesPlayer> callback){
+		new BukkitRunnable(){
+			@Override
+			public void run() {
+				ServerVariablesPlayer playerData = null;
+				CommonConfig playerConfig = getConfigFile(uuid+".yml",false);
+				if(playerConfig != null){
+					// If config exists
+					FileConfiguration config = playerConfig.getConfig();
+					String name = config.getString("name");
+
+					Map<String,ServerVariablesVariable> variables = new HashMap<>();
+					if (config.contains("variables")) {
+						for (String key : config.getConfigurationSection("variables").getKeys(false)) {
+							if(config.isList("variables."+key)){
+								variables.put(key,new ServerVariablesListVariable(key, config.getStringList("variables." + key)));
+							}else{
+								variables.put(key,new ServerVariablesStringVariable(key, config.getString("variables." + key)));
+							}
+						}
 					}
+
+					playerData = new ServerVariablesPlayer(uuid, name, variables);
 				}
+
+				ServerVariablesPlayer finalPlayer = playerData;
+
+				new BukkitRunnable(){
+					@Override
+					public void run() {
+						callback.onDone(finalPlayer);
+					}
+				}.runTask(plugin);
 			}
-
-			UUID uuid = UUID.fromString(uuidString);
-			ServerVariablesPlayer player = new ServerVariablesPlayer(uuid, name, variables);
-			players.put(uuid, player);
-		}
-
-		plugin.getPlayerVariablesManager().setPlayerVariables(players);
+		}.runTaskAsynchronously(plugin);
 	}
 
 	public void savePlayer(ServerVariablesPlayer player){
 		String playerName = player.getName();
-		CommonConfig playerConfig = getConfigFile(player.getUuid()+".yml");
+		CommonConfig playerConfig = getConfigFile(player.getUuid()+".yml",true);
 		FileConfiguration playerFile = playerConfig.getConfig();
 
 		playerFile.set("name", playerName);
@@ -78,6 +93,18 @@ public class PlayersConfigsManager extends DataFolderConfigManager{
 				savePlayer(player);
 			}
 			player.setModified(false);
+		}
+	}
+
+	public void resetDataForAllPlayers(String variableName){
+		ArrayList<CommonConfig> configs = getConfigs();
+		for(CommonConfig commonConfig : configs) {
+			FileConfiguration config = commonConfig.getConfig();
+
+			if(config.contains("variables."+variableName)){
+				config.set("variables."+variableName,null);
+				commonConfig.saveConfig();
+			}
 		}
 	}
 }

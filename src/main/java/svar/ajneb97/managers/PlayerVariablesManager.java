@@ -1,6 +1,7 @@
 package svar.ajneb97.managers;
 
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import svar.ajneb97.ServerVariables;
 import svar.ajneb97.database.MySQLConnection;
 import svar.ajneb97.model.ListVariableResult;
@@ -19,17 +20,11 @@ public class PlayerVariablesManager {
     public PlayerVariablesManager(ServerVariables plugin) {
         this.plugin = plugin;
         this.playerNames = new HashMap<>();
+        this.playerVariables = new HashMap<>();
     }
 
     public Map<UUID,ServerVariablesPlayer> getPlayerVariables() {
         return playerVariables;
-    }
-
-    public void setPlayerVariables(Map<UUID,ServerVariablesPlayer> playerVariables) {
-        this.playerVariables = playerVariables;
-        for(Map.Entry<UUID, ServerVariablesPlayer> entry : playerVariables.entrySet()){
-            playerNames.put(entry.getValue().getName(),entry.getKey());
-        }
     }
 
     public void addPlayer(ServerVariablesPlayer p){
@@ -61,43 +56,67 @@ public class PlayerVariablesManager {
         playerVariables.remove(uuid);
     }
 
+    public void removePlayer(ServerVariablesPlayer playerData){
+        playerVariables.remove(playerData.getUuid());
+        playerNames.remove(playerData.getName());
+    }
+
     // When joining the game
-    public void setJoinPlayerData(Player player){
-        if(plugin.getMySQLConnection() != null){
-            MySQLConnection mySQLConnection = plugin.getMySQLConnection();
-            UUID uuid = player.getUniqueId();
-            mySQLConnection.getPlayer(uuid.toString(), playerData -> {
-                removePlayerByUUID(uuid); //Remove data if already exists
-                if(playerData != null) {
-                    addPlayer(playerData);
-                    //Update name if different
-                    if(!playerData.getName().equals(player.getName())){
-                        updatePlayerName(playerData.getName(),player.getName(),player.getUniqueId());
-                        playerData.setName(player.getName());
-                        mySQLConnection.updatePlayerName(playerData);
+    public void manageJoin(Player player){
+        plugin.getConfigsManager().getPlayerConfigsManager().loadConfig(player.getUniqueId(), playerDataFile -> {
+            if(plugin.getMySQLConnection() != null) {
+                MySQLConnection mySQLConnection = plugin.getMySQLConnection();
+                UUID uuid = player.getUniqueId();
+                mySQLConnection.getPlayer(uuid.toString(), playerDataSQL -> {
+                    if(playerDataSQL != null) {
+                        addPlayer(playerDataSQL);
+                        //Update name if different
+                        if (!playerDataSQL.getName().equals(player.getName())) {
+                            updatePlayerName(playerDataSQL.getName(), player.getName(), player.getUniqueId());
+                            playerDataSQL.setName(player.getName());
+                            mySQLConnection.updatePlayerName(playerDataSQL);
+                        }
+                    }else {
+                        playerDataSQL = new ServerVariablesPlayer(uuid,player.getName(),new HashMap<>());
+                        addPlayer(playerDataSQL);
+                        //Create if it doesn't exist
+                        mySQLConnection.createPlayer(playerDataSQL);
                     }
-                }else {
-                    playerData = new ServerVariablesPlayer(uuid,player.getName(),new HashMap<>());
-                    addPlayer(playerData);
-                    //Create if it doesn't exist
-                    mySQLConnection.createPlayer(playerData);
-                }
-            });
-        }else{
-            ServerVariablesPlayer p = getPlayerByUUID(player.getUniqueId());
-            if(p != null){
-                //Update name
-                if(p.getName() == null || !p.getName().equals(player.getName())){
-                    updatePlayerName(p.getName(),player.getName(),player.getUniqueId());
-                    p.setName(player.getName());
-                    p.setModified(true);
-                }
+                });
             }else{
-                //Create empty data for player
-                p = new ServerVariablesPlayer(player.getUniqueId(),player.getName(),new HashMap<>());
-                p.setModified(true);
-                addPlayer(p);
+                if(playerDataFile != null){
+                    addPlayer(playerDataFile);
+                    if(playerDataFile.getName() == null || !playerDataFile.getName().equals(player.getName())){
+                        updatePlayerName(playerDataFile.getName(),player.getName(),player.getUniqueId());
+                        playerDataFile.setName(player.getName());
+                        playerDataFile.setModified(true);
+                    }
+                }else{
+                    //Create empty data for player
+                    playerDataFile = new ServerVariablesPlayer(player.getUniqueId(),player.getName(),new HashMap<>());
+                    playerDataFile.setModified(true);
+                    addPlayer(playerDataFile);
+                }
             }
+        });
+    }
+
+    public void manageLeave(Player player){
+        // Save player data into file and remove from map
+        ServerVariablesPlayer playerData = getPlayerByUUID(player.getUniqueId());
+        if(playerData != null){
+            if(plugin.getMySQLConnection() == null) {
+                if(playerData.isModified()){
+                    new BukkitRunnable(){
+                        @Override
+                        public void run() {
+                            plugin.getConfigsManager().getPlayerConfigsManager().savePlayer(playerData);
+                        }
+                    }.runTaskAsynchronously(plugin);
+                }
+            }
+
+            removePlayer(playerData);
         }
     }
 

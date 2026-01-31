@@ -34,7 +34,6 @@ public class MySQLConnection {
             connection = new HikariConnection(config);
             connection.getHikari().getConnection();
             createTables();
-            loadData();
             Bukkit.getConsoleSender().sendMessage(MessagesManager.getLegacyColoredMessage(plugin.prefix+" &aSuccessfully connected to the Database."));
         }catch(Exception e) {
             Bukkit.getConsoleSender().sendMessage(MessagesManager.getLegacyColoredMessage(plugin.prefix+" &cError while connecting to the Database."));
@@ -48,51 +47,6 @@ public class MySQLConnection {
             e.printStackTrace();
             return null;
         }
-    }
-
-    public void loadData(){
-        Map<UUID, ServerVariablesPlayer> playerMap = new HashMap<>();
-        VariablesManager variablesManager = plugin.getVariablesManager();
-        try(Connection connection = getConnection()){
-            PreparedStatement statement = connection.prepareStatement(
-                    "SELECT servervariables_players.UUID, servervariables_players.PLAYER_NAME, " +
-                            "servervariables_players_variables.NAME, " +
-                            "servervariables_players_variables.VALUE " +
-                            "FROM servervariables_players LEFT JOIN servervariables_players_variables " +
-                            "ON servervariables_players.UUID = servervariables_players_variables.UUID");
-
-            ResultSet result = statement.executeQuery();
-            while(result.next()){
-                UUID uuid = UUID.fromString(result.getString("UUID"));
-                String playerName = result.getString("PLAYER_NAME");
-                String variableName = result.getString("NAME");
-                String variableValue = result.getString("VALUE");
-
-                ServerVariablesPlayer player = playerMap.get(uuid);
-                if(player == null){
-                    //Create and add it
-                    player = new ServerVariablesPlayer(uuid,playerName,new HashMap<>());
-                    playerMap.put(uuid, player);
-                }
-
-                if(variableName != null && variableValue != null){
-                    Variable variable = variablesManager.getVariable(variableName);
-                    if(variable == null) {
-                        continue;
-                    }
-
-                    if(variable.getValueType().equals(ValueType.LIST)){
-                        player.addVariable(new ServerVariablesListVariable(variableName,new ArrayList<>(Arrays.asList(variableValue.split("\\|")))));
-                    }else{
-                        player.addVariable(new ServerVariablesStringVariable(variableName,variableValue));
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        plugin.getPlayerVariablesManager().setPlayerVariables(playerMap);
     }
 
     public void createTables() {

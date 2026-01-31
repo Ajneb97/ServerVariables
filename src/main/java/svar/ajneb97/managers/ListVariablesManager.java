@@ -9,7 +9,6 @@ import svar.ajneb97.model.*;
 import svar.ajneb97.model.structure.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ListVariablesManager {
@@ -119,7 +118,12 @@ public class ListVariablesManager {
                 }
             }
 
-            // Check if player has joined the server.
+            // Check online.
+            if(Bukkit.getPlayer(playerName) == null){
+                return ListVariableResult.error(config.getString("messages.playerNotOnline"),"playerNotOnline");
+            }
+
+            // Check if player has data.
             serverVariablesPlayer = plugin.getPlayerVariablesManager().getPlayerByName(playerName);
             if(serverVariablesPlayer == null){
                 return ListVariableResult.error(config.getString("messages.playerNoData"),"playerNoData");

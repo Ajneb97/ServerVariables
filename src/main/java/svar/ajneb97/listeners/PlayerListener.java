@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import svar.ajneb97.ServerVariables;
 import svar.ajneb97.managers.MessagesManager;
 
@@ -19,7 +20,7 @@ public class PlayerListener implements Listener {
         Player player = event.getPlayer();
 
         //Create or update player data
-        plugin.getPlayerVariablesManager().setJoinPlayerData(player);
+        plugin.getPlayerVariablesManager().manageJoin(player);
 
         //Update notification
         String latestVersion = plugin.getUpdateCheckerManager().getLatestVersion();
@@ -27,5 +28,10 @@ public class PlayerListener implements Listener {
             player.sendMessage(MessagesManager.getLegacyColoredMessage(plugin.prefix+" &cThere is a new version available. &e(&7"+latestVersion+"&e)"));
             player.sendMessage(MessagesManager.getLegacyColoredMessage("&cYou can download it at: &ahttps://modrinth.com/plugin/servervariables"));
         }
+    }
+
+    @EventHandler
+    public void onLeave(PlayerQuitEvent event){
+        plugin.getPlayerVariablesManager().manageLeave(event.getPlayer());
     }
 }

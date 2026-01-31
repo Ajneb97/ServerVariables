@@ -7,6 +7,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import svar.ajneb97.ServerVariables;
 import svar.ajneb97.managers.MessagesManager;
+import svar.ajneb97.managers.VariablesManager;
 import svar.ajneb97.model.ListVariableResult;
 import svar.ajneb97.model.StringVariableResult;
 import svar.ajneb97.model.internal.ValueFromArgumentResult;
@@ -258,29 +259,39 @@ public class ListCommand {
 
         String variableName = args[2];
         String playerName = null;
-        if(args.length >= 4 && !args[3].equals("silent:true")) {
-            playerName = args[3];
-        }
-        StringVariableResult result = plugin.getVariablesManager().resetVariable(playerName,variableName,playerName != null && playerName.equals("*"));
-
         boolean silent = args[args.length-1].equals("silent:true");
 
-        if(result.isError()){
-            msgManager.sendMessage(sender,result.getErrorMessage(),true);
+        VariablesManager variablesManager = plugin.getVariablesManager();
+
+        if(args.length >= 4 && !args[3].equals("silent:true")){
+            playerName = args[3];
+            if(playerName.equals("*")){
+                variablesManager.resetVariableForAllPlayers(variableName, result -> {
+                    if(result.isError()){
+                        msgManager.sendMessage(sender,result.getErrorMessage(),true);
+                        return;
+                    }
+                    if(silent) return;
+                    msgManager.sendMessage(sender,config.getString("messages.commandResetCorrectAll").replace("%variable%",variableName),true);
+                });
+            }else{
+                StringVariableResult result = variablesManager.resetVariableForPlayer(playerName,variableName);
+                if(result.isError()){
+                    msgManager.sendMessage(sender,result.getErrorMessage(),true);
+                    return;
+                }
+                if(silent) return;
+                msgManager.sendMessage(sender,config.getString("messages.commandResetCorrectPlayer").replace("%variable%",variableName)
+                        .replace("%player%",playerName),true);
+            }
         }else{
-            if(silent){
+            StringVariableResult result = variablesManager.resetGlobalVariable(variableName);
+            if(result.isError()){
+                msgManager.sendMessage(sender,result.getErrorMessage(),true);
                 return;
             }
-            if(playerName != null){
-                if(playerName.equals("*")){
-                    msgManager.sendMessage(sender,config.getString("messages.commandResetCorrectAll").replace("%variable%",variableName),true);
-                }else{
-                    msgManager.sendMessage(sender,config.getString("messages.commandResetCorrectPlayer").replace("%variable%",variableName)
-                            .replace("%player%",playerName),true);
-                }
-            }else{
-                msgManager.sendMessage(sender,config.getString("messages.commandResetCorrect").replace("%variable%",variableName),true);
-            }
+            if(silent) return;
+            msgManager.sendMessage(sender,config.getString("messages.commandResetCorrect").replace("%variable%",variableName),true);
         }
     }
 
@@ -307,12 +318,22 @@ public class ListCommand {
         if(result.isError()){
             msgManager.sendMessage(sender,result.getErrorMessage(),true);
         }else{
-            StringBuilder sb = new StringBuilder("&7[");
-            for (int i = 0; i < list.size(); i++) {
-                if (i > 0) sb.append(", ");
-                sb.append("&e").append(i).append(":&7").append(list.get(i));
+            StringBuilder sb;
+            if(plugin.getConfigsManager().getMainConfigManager().isUseMiniMessage()){
+                sb = new StringBuilder("<gray>[");
+                for (int i = 0; i < list.size(); i++) {
+                    if (i > 0) sb.append(", ");
+                    sb.append("<yellow>").append(i).append(":<gray>").append(list.get(i));
+                }
+            }else{
+                sb = new StringBuilder("&7[");
+                for (int i = 0; i < list.size(); i++) {
+                    if (i > 0) sb.append(", ");
+                    sb.append("&e").append(i).append(":&7").append(list.get(i));
+                }
             }
             sb.append("]");
+
             if(playerName != null){
                 msgManager.sendMessage(sender,config.getString("messages.commandListDisplayCorrectPlayer").replace("%variable%",variableName)
                         .replace("%values%",sb.toString()).replace("%player%",playerName),true);
