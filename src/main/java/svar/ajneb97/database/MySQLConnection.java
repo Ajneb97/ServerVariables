@@ -72,59 +72,47 @@ public class MySQLConnection {
         }
     }
 
-    public void getPlayer(String uuid,PlayerCallback callback){
-        new BukkitRunnable(){
-            @Override
-            public void run() {
-                VariablesManager variablesManager = plugin.getVariablesManager();
-                ServerVariablesPlayer player = null;
-                try(Connection connection = getConnection()){
-                    PreparedStatement statement = connection.prepareStatement(
-                            "SELECT servervariables_players.UUID, servervariables_players.PLAYER_NAME, " +
-                                    "servervariables_players_variables.NAME, " +
-                                    "servervariables_players_variables.VALUE " +
-                                    "FROM servervariables_players LEFT JOIN servervariables_players_variables " +
-                                    "ON servervariables_players.UUID = servervariables_players_variables.UUID " +
-                                    "WHERE servervariables_players.UUID = ?");
+    public ServerVariablesPlayer getPlayer(String uuid){
+        VariablesManager variablesManager = plugin.getVariablesManager();
+        ServerVariablesPlayer player = null;
+        try(Connection connection = getConnection()){
+            PreparedStatement statement = connection.prepareStatement(
+                    "SELECT servervariables_players.UUID, servervariables_players.PLAYER_NAME, " +
+                            "servervariables_players_variables.NAME, " +
+                            "servervariables_players_variables.VALUE " +
+                            "FROM servervariables_players LEFT JOIN servervariables_players_variables " +
+                            "ON servervariables_players.UUID = servervariables_players_variables.UUID " +
+                            "WHERE servervariables_players.UUID = ?");
 
-                    statement.setString(1, uuid);
-                    ResultSet result = statement.executeQuery();
+            statement.setString(1, uuid);
+            ResultSet result = statement.executeQuery();
 
-                    boolean firstFind = true;
-                    while(result.next()){
-                        String playerName = result.getString("PLAYER_NAME");
-                        String variableName = result.getString("NAME");
-                        String variableValue = result.getString("VALUE");
-                        if(firstFind){
-                            firstFind = false;
-                            player = new ServerVariablesPlayer(UUID.fromString(uuid),playerName,new HashMap<>());
-                        }
-                        if(variableName != null && variableValue != null){
-                            Variable variable = variablesManager.getVariable(variableName);
-                            if(variable == null) {
-                                continue;
-                            }
-
-                            if(variable.getValueType().equals(ValueType.LIST)){
-                                player.addVariable(new ServerVariablesListVariable(variableName,new ArrayList<>(Arrays.asList(variableValue.split("\\|")))));
-                            }else{
-                                player.addVariable(new ServerVariablesStringVariable(variableName,variableValue));
-                            }
-                        }
+            boolean firstFind = true;
+            while(result.next()){
+                String playerName = result.getString("PLAYER_NAME");
+                String variableName = result.getString("NAME");
+                String variableValue = result.getString("VALUE");
+                if(firstFind){
+                    firstFind = false;
+                    player = new ServerVariablesPlayer(UUID.fromString(uuid),playerName,new HashMap<>());
+                }
+                if(variableName != null && variableValue != null){
+                    Variable variable = variablesManager.getVariable(variableName);
+                    if(variable == null) {
+                        continue;
                     }
 
-                    ServerVariablesPlayer finalPlayer = player;
-                    new BukkitRunnable(){
-                        @Override
-                        public void run() {
-                            callback.onDone(finalPlayer);
-                        }
-                    }.runTask(plugin);
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                    if(variable.getValueType().equals(ValueType.LIST)){
+                        player.addVariable(new ServerVariablesListVariable(variableName,new ArrayList<>(Arrays.asList(variableValue.split("\\|")))));
+                    }else{
+                        player.addVariable(new ServerVariablesStringVariable(variableName,variableValue));
+                    }
                 }
             }
-        }.runTaskAsynchronously(plugin);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return player;
     }
 
     public void createPlayer(ServerVariablesPlayer player){

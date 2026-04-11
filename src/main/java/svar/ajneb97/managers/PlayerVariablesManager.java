@@ -1,6 +1,7 @@
 package svar.ajneb97.managers;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import svar.ajneb97.ServerVariables;
 import svar.ajneb97.database.MySQLConnection;
@@ -62,43 +63,48 @@ public class PlayerVariablesManager {
     }
 
     // When joining the game
-    public void manageJoin(Player player){
-        plugin.getConfigsManager().getPlayerConfigsManager().loadConfig(player.getUniqueId(), playerDataFile -> {
-            if(plugin.getMySQLConnection() != null) {
-                MySQLConnection mySQLConnection = plugin.getMySQLConnection();
-                UUID uuid = player.getUniqueId();
-                mySQLConnection.getPlayer(uuid.toString(), playerDataSQL -> {
-                    if(playerDataSQL != null) {
-                        addPlayer(playerDataSQL);
-                        //Update name if different
-                        if (!playerDataSQL.getName().equals(player.getName())) {
-                            updatePlayerName(playerDataSQL.getName(), player.getName(), player.getUniqueId());
-                            playerDataSQL.setName(player.getName());
-                            mySQLConnection.updatePlayerName(playerDataSQL);
-                        }
-                    }else {
-                        playerDataSQL = new ServerVariablesPlayer(uuid,player.getName(),new HashMap<>());
-                        addPlayer(playerDataSQL);
-                        //Create if it doesn't exist
-                        mySQLConnection.createPlayer(playerDataSQL);
-                    }
-                });
-            }else{
-                if(playerDataFile != null){
-                    addPlayer(playerDataFile);
-                    if(playerDataFile.getName() == null || !playerDataFile.getName().equals(player.getName())){
-                        updatePlayerName(playerDataFile.getName(),player.getName(),player.getUniqueId());
-                        playerDataFile.setName(player.getName());
-                        playerDataFile.setModified(true);
-                    }
-                }else{
-                    //Create empty data for player
-                    playerDataFile = new ServerVariablesPlayer(player.getUniqueId(),player.getName(),new HashMap<>());
-                    playerDataFile.setModified(true);
-                    addPlayer(playerDataFile);
+    // Async
+    public void manageJoin(AsyncPlayerPreLoginEvent event){
+        if(!event.getLoginResult().equals(AsyncPlayerPreLoginEvent.Result.ALLOWED)){
+            return;
+        }
+
+        UUID uuid = event.getUniqueId();
+        String playerName = event.getName();
+
+        if(plugin.getMySQLConnection() != null) {
+            MySQLConnection mySQLConnection = plugin.getMySQLConnection();
+            ServerVariablesPlayer playerDataSQL = mySQLConnection.getPlayer(uuid.toString());
+            if(playerDataSQL != null) {
+                addPlayer(playerDataSQL);
+                //Update name if different
+                if (!playerDataSQL.getName().equals(playerName)) {
+                    updatePlayerName(playerDataSQL.getName(), playerName, uuid);
+                    playerDataSQL.setName(playerName);
+                    mySQLConnection.updatePlayerName(playerDataSQL);
                 }
+            }else {
+                playerDataSQL = new ServerVariablesPlayer(uuid,playerName,new HashMap<>());
+                addPlayer(playerDataSQL);
+                //Create if it doesn't exist
+                mySQLConnection.createPlayer(playerDataSQL);
             }
-        });
+        }else{
+            ServerVariablesPlayer playerDataFile = plugin.getConfigsManager().getPlayerConfigsManager().loadConfig(uuid);
+            if(playerDataFile != null){
+                addPlayer(playerDataFile);
+                if(playerDataFile.getName() == null || !playerDataFile.getName().equals(playerName)){
+                    updatePlayerName(playerDataFile.getName(),playerName,uuid);
+                    playerDataFile.setName(playerName);
+                    playerDataFile.setModified(true);
+                }
+            }else{
+                //Create empty data for player
+                playerDataFile = new ServerVariablesPlayer(uuid,playerName,new HashMap<>());
+                playerDataFile.setModified(true);
+                addPlayer(playerDataFile);
+            }
+        }
     }
 
     public void manageLeave(Player player){

@@ -2,7 +2,9 @@ package svar.ajneb97.listeners;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import svar.ajneb97.ServerVariables;
@@ -15,12 +17,15 @@ public class PlayerListener implements Listener {
         this.plugin = plugin;
     }
 
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPreJoinMonitor(AsyncPlayerPreLoginEvent event){
+        //Create or update player data
+        plugin.getPlayerVariablesManager().manageJoin(event);
+    }
+
     @EventHandler
     public void onJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
-
-        //Create or update player data
-        plugin.getPlayerVariablesManager().manageJoin(player);
 
         //Update notification
         String latestVersion = plugin.getUpdateCheckerManager().getLatestVersion();

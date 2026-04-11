@@ -30,7 +30,32 @@ public class PlayersConfigsManager extends DataFolderConfigManager{
 		// No use for player config
 	}
 
-	public void loadConfig(UUID uuid, GenericCallback<ServerVariablesPlayer> callback){
+	public ServerVariablesPlayer loadConfig(UUID uuid){
+		ServerVariablesPlayer playerData = null;
+		CommonConfig playerConfig = getConfigFile(uuid+".yml",false);
+		if(playerConfig != null){
+			// If config exists
+			FileConfiguration config = playerConfig.getConfig();
+			String name = config.getString("name");
+
+			Map<String,ServerVariablesVariable> variables = new HashMap<>();
+			if (config.contains("variables")) {
+				for (String key : config.getConfigurationSection("variables").getKeys(false)) {
+					if(config.isList("variables."+key)){
+						variables.put(key,new ServerVariablesListVariable(key, config.getStringList("variables." + key)));
+					}else{
+						variables.put(key,new ServerVariablesStringVariable(key, config.getString("variables." + key)));
+					}
+				}
+			}
+
+			playerData = new ServerVariablesPlayer(uuid, name, variables);
+		}
+
+		return playerData;
+	}
+
+	public void loadConfigAsync(UUID uuid, GenericCallback<ServerVariablesPlayer> callback){
 		new BukkitRunnable(){
 			@Override
 			public void run() {
