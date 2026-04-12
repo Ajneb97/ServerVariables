@@ -51,6 +51,10 @@ public class ServerVariablesExpansion extends PlaceholderExpansion {
             // %servervariables_list_length_<variable>%
             // %servervariables_list_globalcontains_<variable>:<value>%
             // %servervariables_list_contains_<variable>:<value>%
+            // %servervariables_list_globalallvalues_<variable>%
+            // %servervariables_list_allvalues_<variable>%
+            // %servervariables_list_globalalldisplay_<variable>%
+            // %servervariables_list_alldisplay_<variable>%
             String identifierM = identifier.replace("list_","");
             String[] sep = identifierM.split("_");
             String subIdentifier = sep[0];
@@ -108,6 +112,28 @@ public class ServerVariablesExpansion extends PlaceholderExpansion {
                     String variableName = identifierM.replace("contains_", "");
                     String[] sep2 = variableName.split(":");
                     return ServerVariablesAPI.listVariableContainsValue(player.getName(), sep2[0], sep2[1]) + "";
+                }
+                case "globalallvalues": {
+                    String variableName = identifierM.replace("globalallvalues_", "");
+                    return ServerVariablesAPI.getListVariableAllValues(variableName);
+                }
+                case "allvalues": {
+                    if (player == null) {
+                        return "";
+                    }
+                    String variableName = identifierM.replace("allvalues_", "");
+                    return ServerVariablesAPI.getListVariableAllValues(player.getName(), variableName);
+                }
+                case "globalalldisplay": {
+                    String variableName = identifierM.replace("globalalldisplay_", "");
+                    return ServerVariablesAPI.getListVariableAllValuesDisplay(variableName);
+                }
+                case "alldisplay": {
+                    if (player == null) {
+                        return "";
+                    }
+                    String variableName = identifierM.replace("alldisplay_", "");
+                    return ServerVariablesAPI.getListVariableAllValuesDisplay(player.getName(), variableName);
                 }
             }
         }else if(identifier.startsWith("globalvalue_")){
