@@ -121,6 +121,14 @@ public class ServerVariablesAPI {
         return result.getResultValue().size();
     }
 
+    public static StringVariableResult getListVariableValues(String playerName, String variableName){
+        return plugin.getPlayerVariablesManager().getListVariableValues(playerName,variableName);
+    }
+
+    public static StringVariableResult getListVariableValues(String variableName){
+        return plugin.getVariablesManager().getListVariablesManager().getListVariableValues(null,variableName);
+    }
+
     public static ServerVariablesPlayer getPlayerByName(String playerName){
         return plugin.getPlayerVariablesManager().getPlayerByName(playerName);
     }

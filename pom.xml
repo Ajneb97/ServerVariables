@@ -6,7 +6,7 @@
 
     <groupId>svar.ajneb97</groupId>
     <artifactId>ServerVariables</artifactId>
-    <version>3.5.2</version>
+    <version>3.6.1</version>
     <packaging>jar</packaging>
 
     <properties>

@@ -51,6 +51,8 @@ public class ServerVariablesExpansion extends PlaceholderExpansion {
             // %servervariables_list_length_<variable>%
             // %servervariables_list_globalcontains_<variable>:<value>%
             // %servervariables_list_contains_<variable>:<value>%
+            // %servervariables_list_globalvalues_<variable>%
+            // %servervariables_list_values_<variable>%
             String identifierM = identifier.replace("list_","");
             String[] sep = identifierM.split("_");
             String subIdentifier = sep[0];
@@ -108,6 +110,19 @@ public class ServerVariablesExpansion extends PlaceholderExpansion {
                     String variableName = identifierM.replace("contains_", "");
                     String[] sep2 = variableName.split(":");
                     return ServerVariablesAPI.listVariableContainsValue(player.getName(), sep2[0], sep2[1]) + "";
+                }
+                case "globalvalues": {
+                    String variableName = identifierM.replace("globalvalues_","");
+                    result = ServerVariablesAPI.getListVariableValues(variableName);
+                    return result.getResultValue() != null ? result.getResultValue() : result.getErrorKey();
+                }
+                case "values": {
+                    if (player == null) {
+                        return "";
+                    }
+                    String variableName = identifierM.replace("values_","");
+                    result = ServerVariablesAPI.getListVariableValues(player.getName(), variableName);
+                    return result.getResultValue() != null ? result.getResultValue() : result.getErrorKey();
                 }
             }
         }else if(identifier.startsWith("globalvalue_")){

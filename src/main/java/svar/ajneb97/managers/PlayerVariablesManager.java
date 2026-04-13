@@ -170,4 +170,13 @@ public class PlayerVariablesManager {
     public ListVariableResult getListVariableValue(String playerName, String variableName){
         return plugin.getVariablesManager().getListVariablesManager().getListVariableValue(playerName,variableName,false);
     }
+
+    public StringVariableResult getListVariableValues(UUID uuid, String variableName){
+        ServerVariablesPlayer variablesPlayer = getPlayerByUUID(uuid);
+        return plugin.getVariablesManager().getListVariablesManager().getListVariableValues(variablesPlayer.getName(),variableName);
+    }
+
+    public StringVariableResult getListVariableValues(String playerName, String variableName){
+        return plugin.getVariablesManager().getListVariablesManager().getListVariableValues(playerName,variableName);
+    }
 }

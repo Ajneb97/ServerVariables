@@ -20,6 +20,7 @@ public class MainConfigManager {
 	private boolean isMySQL;
 	private boolean silentCommandsHideErrors;
 	private boolean useMiniMessage;
+	private String variablesListValuesSeparator;
 
 	public MainConfigManager(ServerVariables plugin) {
 		this.plugin = plugin;
@@ -44,6 +45,7 @@ public class MainConfigManager {
 		isMySQL = config.getBoolean("config.mysql_database.enabled");
 		silentCommandsHideErrors = config.getBoolean("config.silent_commands_hide_errors");
 		useMiniMessage = config.getBoolean("config.use_minimessage");
+		variablesListValuesSeparator = config.getString("config.variables.list_values_separator");
 	}
 
 	public boolean reloadConfig(){
@@ -79,6 +81,10 @@ public class MainConfigManager {
 		try{
 			String text = new String(Files.readAllBytes(pathConfig));
 			FileConfiguration config = getConfig();
+			if(!text.contains("list_values_separator:")){
+				config.set("config.variables.list_values_separator",", ");
+				saveConfig();
+			}
 			if(!text.contains("use_minimessage:")){
 				config.set("config.use_minimessage",false);
 				saveConfig();
@@ -157,5 +163,9 @@ public class MainConfigManager {
 
 	public boolean isUseMiniMessage() {
 		return useMiniMessage;
+	}
+
+	public String getVariablesListValuesSeparator() {
+		return variablesListValuesSeparator;
 	}
 }

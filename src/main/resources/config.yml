@@ -3,6 +3,8 @@ config:
   data_save_time: 5
   silent_commands_hide_errors: false
   use_minimessage: false
+  variables:
+    list_values_separator: ", "
   mysql_database:
     enabled: false
     host: localhost

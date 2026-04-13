@@ -155,6 +155,25 @@ public class ListVariablesManager {
                 .withServerVariablesPlayer(serverVariablesPlayer);
     }
 
+    public StringVariableResult getListVariableValues(String playerName, String variableName){
+        ListVariableResult listVariableResult = getListVariableValue(playerName,variableName,false);
+        if(listVariableResult.isError()){
+            return listVariableResult.toStringVariableResult();
+        }
+
+        List<String> list = listVariableResult.getResultValue();
+
+        String separator = plugin.getConfigsManager().getMainConfigManager().getVariablesListValuesSeparator();
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < list.size(); i++) {
+            if (i > 0) sb.append(separator);
+            sb.append(list.get(i));
+        }
+
+        return StringVariableResult.noErrors(sb.toString());
+    }
+
     public StringVariableResult removeListVariableIndex(String playerName, String variableName, int index){
         FileConfiguration config = plugin.getConfigsManager().getMainConfigManager().getConfig();
 
