@@ -21,7 +21,7 @@ public class MainConfigManager {
 	private boolean silentCommandsHideErrors;
 	private boolean useMiniMessage;
 	private String variablesListValuesSeparator;
-	private boolean retainPlayerDataUntilReset;
+	private boolean retainPlayerDataUntilRestart;
 
 	public MainConfigManager(ServerVariables plugin) {
 		this.plugin = plugin;
@@ -47,7 +47,7 @@ public class MainConfigManager {
 		silentCommandsHideErrors = config.getBoolean("config.silent_commands_hide_errors");
 		useMiniMessage = config.getBoolean("config.use_minimessage");
 		variablesListValuesSeparator = config.getString("config.variables.list_values_separator");
-		retainPlayerDataUntilReset = config.getBoolean("config.retain_player_data_until_reset");
+		retainPlayerDataUntilRestart = config.getBoolean("config.retain_player_data_until_restart");
 	}
 
 	public boolean reloadConfig(){
@@ -83,9 +83,10 @@ public class MainConfigManager {
 		try{
 			String text = new String(Files.readAllBytes(pathConfig));
 			FileConfiguration config = getConfig();
-			if(!text.contains("retain_player_data_until_reset:")) {
-				config.set("config.retain_player_data_until_reset", true);
+			if(!text.contains("retain_player_data_until_restart:")) {
+				config.set("config.retain_player_data_until_restart", true);
 				config.set("messages.playerHasNotPlayedRecentlyOrNoData","&cThat player has not played recently or doesn't have any data.");
+				saveConfig();
 			}
 			if(!text.contains("list_values_separator:")){
 				config.set("config.variables.list_values_separator",", ");
@@ -175,7 +176,7 @@ public class MainConfigManager {
 		return variablesListValuesSeparator;
 	}
 
-	public boolean isRetainPlayerDataUntilReset() {
-		return retainPlayerDataUntilReset;
+	public boolean isRetainPlayerDataUntilRestart() {
+		return retainPlayerDataUntilRestart;
 	}
 }

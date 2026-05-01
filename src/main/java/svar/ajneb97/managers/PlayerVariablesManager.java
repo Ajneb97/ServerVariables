@@ -90,9 +90,21 @@ public class PlayerVariablesManager {
                 mySQLConnection.createPlayer(playerDataSQL);
             }
         }else{
-            ServerVariablesPlayer playerDataFile = plugin.getConfigsManager().getPlayerConfigsManager().loadConfig(uuid);
+            ServerVariablesPlayer playerDataFile = null;
+            boolean alreadyOnMemory = false;
+            if(plugin.getConfigsManager().getMainConfigManager().isRetainPlayerDataUntilRestart()){
+                // Try to get retained data
+                playerDataFile = getPlayerByUUID(uuid);
+                alreadyOnMemory = playerDataFile != null;
+            }
+            if(playerDataFile == null){
+                // Try to get file data
+                playerDataFile = plugin.getConfigsManager().getPlayerConfigsManager().loadConfig(uuid);
+            }
             if(playerDataFile != null){
-                addPlayer(playerDataFile);
+                if(!alreadyOnMemory){
+                    addPlayer(playerDataFile);
+                }
                 if(playerDataFile.getName() == null || !playerDataFile.getName().equals(playerName)){
                     updatePlayerName(playerDataFile.getName(),playerName,uuid);
                     playerDataFile.setName(playerName);
@@ -123,7 +135,7 @@ public class PlayerVariablesManager {
             }
 
             // Retain player data if enabled
-            if(!plugin.getConfigsManager().getMainConfigManager().isRetainPlayerDataUntilReset()){
+            if(!plugin.getConfigsManager().getMainConfigManager().isRetainPlayerDataUntilRestart()){
                 removePlayer(playerData);
             }
         }
