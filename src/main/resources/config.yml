@@ -1,6 +1,7 @@
 config:
   update_notify: true
   data_save_time: 5
+  retain_player_data_until_reset: true
   silent_commands_hide_errors: false
   use_minimessage: false
   variables:
@@ -39,12 +40,11 @@ messages:
   variableReduceError: "&cCan't reduce a value from a non-numerical variable."
   commandSetCorrect: "&aVariable &7%variable% &aset to &7%value%&a."
   commandSetCorrectPlayer: "&aVariable &7%variable% &aset to &7%value% &afor player &e%player%&a."
-  playerNotOnline: "&cThat player is not online."
   pluginReloaded: "&aPlugin reloaded!"
   commandGetCorrect: "&aVariable &7%variable% &acurrent value is: &7%value%&a."
   commandGetCorrectPlayer: "&aVariable &7%variable% &acurrent value from player &e%player% &ais: &7%value%&a."
   invalidValue: "&cYou must use a valid number value."
-  playerNoData: "&cThere is no data for that player."
+  playerHasNotPlayedRecentlyOrNoData: "&cThat player has not played recently or doesn't have any data."
   commandResetCorrect: "&aVariable &7%variable% &areset."
   commandResetCorrectPlayer: "&aVariable &7%variable% &areset for player &e%player%&a."
   commandResetCorrectAll: "&aVariable &7%variable% &areset for &eall players&a."

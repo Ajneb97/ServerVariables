@@ -118,15 +118,10 @@ public class ListVariablesManager {
                 }
             }
 
-            // Check online.
-            if(Bukkit.getPlayer(playerName) == null){
-                return ListVariableResult.error(config.getString("messages.playerNotOnline"),"playerNotOnline");
-            }
-
             // Check if player has data.
             serverVariablesPlayer = plugin.getPlayerVariablesManager().getPlayerByName(playerName);
             if(serverVariablesPlayer == null){
-                return ListVariableResult.error(config.getString("messages.playerNoData"),"playerNoData");
+                return ListVariableResult.error(config.getString("messages.playerHasNotPlayedRecentlyOrNoData"),"playerHasNotPlayedRecentlyOrNoData");
             }
 
             currentVariable = (ServerVariablesListVariable) serverVariablesPlayer.getCurrentVariable(variableName);

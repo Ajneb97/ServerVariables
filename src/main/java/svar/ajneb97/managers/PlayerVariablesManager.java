@@ -122,7 +122,10 @@ public class PlayerVariablesManager {
                 }
             }
 
-            removePlayer(playerData);
+            // Retain player data if enabled
+            if(!plugin.getConfigsManager().getMainConfigManager().isRetainPlayerDataUntilReset()){
+                removePlayer(playerData);
+            }
         }
     }
 
