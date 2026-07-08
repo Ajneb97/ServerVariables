@@ -168,6 +168,13 @@ public class ServerVariablesExpansion extends PlaceholderExpansion {
             // %servervariables_initial_value_<variable>%
             String variableName = identifier.replace("initial_value_", "");
             return ServerVariablesAPI.getStringVariableInitialValue(variableName);
+        }else if(identifier.startsWith("possible_value_display_")){
+            // %servervariables_possible_value_display_<variable>:<value>%
+            String var = identifier.replace("possible_value_display_", "");
+            int index = var.indexOf(":");
+            String variable = var.substring(0,index);
+            String value = var.substring(index+1);
+            return ServerVariablesAPI.getVariablePossibleValueDisplay(variable,value);
         }
 
         return null;

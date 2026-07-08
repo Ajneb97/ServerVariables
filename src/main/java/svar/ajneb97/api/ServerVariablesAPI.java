@@ -169,6 +169,11 @@ public class ServerVariablesAPI {
         return result.getResultValue().contains(value);
     }
 
+    public static String getVariablePossibleValueDisplay(String variableName,String possibleValue){
+        return plugin.getVariablesManager().getVariablePossibleValueDisplay(variableName,possibleValue);
+    }
+
+
     public static ServerVariables getPlugin() {
         return plugin;
     }

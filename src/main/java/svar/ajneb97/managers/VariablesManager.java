@@ -458,12 +458,22 @@ public class VariablesManager {
             if(fullValue[0].equals(value)){
                 if(fullValue.length > 1){
                     return fullValue[1];
+                }else{
+                    return "noDisplay";
                 }
             }
         }
 
-        return value;
+        return "noPossibleValue";
     }
 
+    public String getVariablePossibleValueDisplay(String variableName,String value){
+        Variable variable = plugin.getVariablesManager().getVariable(variableName);
+        if(variable == null){
+            return "variableDoesNotExists";
+        }
+
+        return getDisplayFromVariableValue(variable,value);
+    }
 
 }
