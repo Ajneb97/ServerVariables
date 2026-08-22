@@ -25,24 +25,32 @@ public class OtherUtils {
     public static ValueFromArgumentResult getValueFromArgument(String[] args, int startArg){
         String value = args[startArg];
         int valueExtraArgs = 0;
-        if(value.startsWith("\"")){
-            String newValueWithSpaces = value; // "value with spaces"
-            for(int i=startArg+1;i<args.length;i++){
+
+        if (value.startsWith("\"")) {
+            if (value.endsWith("\"") && value.length() > 1) {
+                value = value.substring(1, value.length() - 1);
+                return new ValueFromArgumentResult(value, valueExtraArgs);
+            }
+
+            StringBuilder newValueWithSpaces = new StringBuilder(value);
+            for (int i = startArg + 1; i < args.length; i++) {
                 String arg = args[i];
-                newValueWithSpaces=newValueWithSpaces+" "+arg;
+
+                newValueWithSpaces.append(" ").append(arg);
                 valueExtraArgs++;
-                if(arg.endsWith("\"")){
+
+                if (arg.endsWith("\"")) {
                     break;
                 }
             }
 
-            if(!newValueWithSpaces.startsWith("\"") || !newValueWithSpaces.endsWith("\"")){
+            if (!newValueWithSpaces.toString().endsWith("\"")) {
                 return null;
             }
 
-            value = newValueWithSpaces.replace("\"","");
+            value = newValueWithSpaces.substring(1, newValueWithSpaces.length() - 1);
         }
 
-        return new ValueFromArgumentResult(value,valueExtraArgs);
+        return new ValueFromArgumentResult(value, valueExtraArgs);
     }
 }

@@ -12,6 +12,7 @@ import svar.ajneb97.model.ServerVariablesPlayer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerVariablesManager {
     private ServerVariables plugin;
@@ -20,8 +21,8 @@ public class PlayerVariablesManager {
 
     public PlayerVariablesManager(ServerVariables plugin) {
         this.plugin = plugin;
-        this.playerNames = new HashMap<>();
-        this.playerVariables = new HashMap<>();
+        this.playerNames = new ConcurrentHashMap<>();
+        this.playerVariables = new ConcurrentHashMap<>();
     }
 
     public Map<UUID,ServerVariablesPlayer> getPlayerVariables() {
