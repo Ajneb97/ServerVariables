@@ -6,7 +6,7 @@
 
     <groupId>svar.ajneb97</groupId>
     <artifactId>ServerVariables</artifactId>
-    <version>3.7.3</version>
+    <version>3.8.1</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -38,7 +38,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>26.2-R0.1-SNAPSHOT</version>
+            <version>26.3-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
