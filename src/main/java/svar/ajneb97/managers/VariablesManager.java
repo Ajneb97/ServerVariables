@@ -74,6 +74,10 @@ public class VariablesManager {
             // Check if player has data.
             ServerVariablesPlayer serverVariablesPlayer = plugin.getPlayerVariablesManager().getPlayerByName(playerName);
             if(serverVariablesPlayer == null){
+                // Offline fallback: load stored data by name.
+                serverVariablesPlayer = plugin.getPlayerVariablesManager().loadOfflinePlayerByName(playerName);
+            }
+            if(serverVariablesPlayer == null){
                 return StringVariableResult.error(config.getString("messages.playerHasNotPlayedRecentlyOrNoData"),"playerHasNotPlayedRecentlyOrNoData");
             }
 
@@ -123,6 +127,7 @@ public class VariablesManager {
         StringVariable variable = (StringVariable) aVariable;
         ServerVariablesStringVariable currentVariable;
         ServerVariablesPlayer serverVariablesPlayer = null;
+        boolean offline = false;
         if(playerName != null){
             // The variable should be PLAYER type.
             if(variable.getVariableType().equals(VariableType.GLOBAL)){
@@ -131,6 +136,12 @@ public class VariablesManager {
 
             // Check if player has data.
             serverVariablesPlayer = plugin.getPlayerVariablesManager().getPlayerByName(playerName);
+            if(serverVariablesPlayer == null){
+                // Offline fallback: load stored data by name. This instance is NOT in the live maps,
+                // so the normal save-on-leave path won't fire; we persist it explicitly below.
+                serverVariablesPlayer = plugin.getPlayerVariablesManager().loadOfflinePlayerByName(playerName);
+                offline = serverVariablesPlayer != null;
+            }
             if(serverVariablesPlayer == null){
                 return StringVariableResult.error(config.getString("messages.playerHasNotPlayedRecentlyOrNoData"),"playerHasNotPlayedRecentlyOrNoData");
             }
@@ -169,6 +180,20 @@ public class VariablesManager {
                 currentVariable.setCurrentValue(newValue);
             }
             serverVariablesPlayer.setModified(true);
+
+            // Offline file-mode players never trigger the save-on-leave path, so persist explicitly here.
+            // MySQL mode already persisted above via updateVariable (upsert by UUID). Online players are
+            // left to the existing save-on-leave / DataSaveTask flow, preserving current behavior.
+            if(offline && plugin.getMySQLConnection() == null){
+                final ServerVariablesPlayer offlinePlayer = serverVariablesPlayer;
+                // Async save to mirror manageLeave's save style and avoid main-thread file IO.
+                new BukkitRunnable(){
+                    @Override
+                    public void run() {
+                        plugin.getConfigsManager().getPlayerConfigsManager().savePlayer(offlinePlayer);
+                    }
+                }.runTaskAsynchronously(plugin);
+            }
 
             player = Bukkit.getPlayer(serverVariablesPlayer.getName());
         }else{

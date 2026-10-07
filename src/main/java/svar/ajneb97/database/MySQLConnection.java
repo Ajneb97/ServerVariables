@@ -115,6 +115,23 @@ public class MySQLConnection {
         return player;
     }
 
+    // Synchronous name -> UUID resolve, used only on the offline-fallback path.
+    // Mirrors getPlayer being called synchronously inside manageJoin.
+    public String getUUIDByName(String playerName){
+        try(Connection connection = getConnection()){
+            PreparedStatement statement = connection.prepareStatement(
+                    "SELECT UUID FROM servervariables_players WHERE PLAYER_NAME=? LIMIT 1");
+            statement.setString(1, playerName);
+            ResultSet result = statement.executeQuery();
+            if(result.next()){
+                return result.getString("UUID");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public void createPlayer(ServerVariablesPlayer player){
         new BukkitRunnable(){
             @Override

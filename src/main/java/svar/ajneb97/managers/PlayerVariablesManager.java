@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import svar.ajneb97.ServerVariables;
+import svar.ajneb97.config.model.CommonConfig;
 import svar.ajneb97.database.MySQLConnection;
 import svar.ajneb97.model.ListVariableResult;
 import svar.ajneb97.model.StringVariableResult;
@@ -58,6 +59,45 @@ public class PlayerVariablesManager {
             return null;
         }
         return playerVariables.get(uuid);
+    }
+
+    // Offline fallback: load an offline player's stored data by NAME when they are not in memory.
+    // Returns a freshly loaded instance (NOT registered into the live maps, to avoid double-save/leak)
+    // or null if the name cannot be resolved. Mirrors the mode split used by manageJoin.
+    public ServerVariablesPlayer loadOfflinePlayerByName(String name){
+        if(name == null){
+            return null;
+        }
+
+        if(plugin.getMySQLConnection() != null){
+            // MySQL mode: resolve UUID by name synchronously, then load via existing synchronous getPlayer.
+            MySQLConnection mySQLConnection = plugin.getMySQLConnection();
+            String uuidStr = mySQLConnection.getUUIDByName(name);
+            if(uuidStr == null){
+                return null;
+            }
+            return mySQLConnection.getPlayer(uuidStr);
+        }else{
+            // File mode: no name index exists on disk, so scan the player data folder for a <uuid>.yml
+            // whose name: matches (case-insensitive). Reading many small YAML files synchronously on the
+            // command thread is acceptable for this admin/reward command.
+            for(CommonConfig commonConfig : plugin.getConfigsManager().getPlayerConfigsManager().getConfigs()){
+                String storedName = commonConfig.getConfig().getString("name");
+                if(storedName != null && storedName.equalsIgnoreCase(name)){
+                    String fileName = commonConfig.getPath();
+                    if(fileName.endsWith(".yml")){
+                        fileName = fileName.substring(0, fileName.length() - ".yml".length());
+                    }
+                    try{
+                        UUID uuid = UUID.fromString(fileName);
+                        return plugin.getConfigsManager().getPlayerConfigsManager().loadConfig(uuid);
+                    }catch(IllegalArgumentException e){
+                        // Not a UUID-named file, skip it.
+                    }
+                }
+            }
+            return null;
+        }
     }
 
     public void removePlayerByUUID(UUID uuid){
