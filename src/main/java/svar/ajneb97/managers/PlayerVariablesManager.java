@@ -50,7 +50,13 @@ public class PlayerVariablesManager {
     }
 
     public ServerVariablesPlayer getPlayerByName(String name){
+        if(name == null){
+            return null;
+        }
         UUID uuid = getPlayerUUID(name);
+        if(uuid == null){
+            return null;
+        }
         return playerVariables.get(uuid);
     }
 
