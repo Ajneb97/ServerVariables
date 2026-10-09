@@ -51,6 +51,9 @@ public class PlayerVariablesManager {
 
     public ServerVariablesPlayer getPlayerByName(String name){
         UUID uuid = getPlayerUUID(name);
+        if(uuid == null){
+            return null;
+        }
         return playerVariables.get(uuid);
     }
 
